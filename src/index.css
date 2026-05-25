@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Anton", sans-serif;
+  --font-sans: "Inter", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: #0A0A0A;
+    color: #FFFFFF;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    width: 100%;
+    min-height: 100vh;
+  }
+}
+
+/* Custom visual utilities */
+.text-outline {
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.15);
+  color: transparent;
+}
+
+/* Custom cursor tracker and ambient glow */
+.ambient-glow {
+  background: radial-gradient(circle 600px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.05), transparent 80%);
+  pointer-events: none;
+}
+
+/* Performance and transition overrides */
+.carousel-transition {
+  transition: transform 650ms cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 650ms cubic-bezier(0.4, 0, 0.2, 1),
+              filter 650ms cubic-bezier(0.4, 0, 0.2, 1),
+              left 650ms cubic-bezier(0.4, 0, 0.2, 1),
+              bottom 650ms cubic-bezier(0.4, 0, 0.2, 1),
+              height 650ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity, filter, left, bottom, height;
+}
+
+/* Keyframes and utility for text fade-in-up */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 500ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Bento card styles */
+.bento-card {
+  position: relative;
+  background: rgba(17, 17, 17, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 28px;
+  overflow: hidden;
+  transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 500ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bento-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255, 107, 53, 0.25);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55), 0 0 30px rgba(255, 107, 53, 0.06);
+}
+
+.bento-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle 350px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 107, 53, 0.12), transparent 80%);
+  opacity: 0;
+  transition: opacity 350ms ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.bento-card:hover::before {
+  opacity: 1;
+}
+
+
