@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ArrowLeft, ArrowRight, Zap, Code, Users, ShieldCheck, Globe, Palette, Server, TrendingUp, CheckCircle2, Cpu, Puzzle, Brain, Layers, Search, Map, Code2, Rocket } from "lucide-react";
+import { ArrowLeft, ArrowRight, Zap, Code, Users, ShieldCheck, Globe, Palette, Server, TrendingUp, CheckCircle2, Cpu, Puzzle, Brain, Layers, Search, Map, Code2, Rocket, Menu, X } from "lucide-react";
 import "./App.css";
+import ElectricBorder from "./components/ElectricBorder";
 
 // Interface for founder data
 interface Founder {
@@ -102,8 +103,160 @@ const processFounderImage = (src: string): Promise<string> => {
   });
 };
 
+function Navbar() {
+  const [scrolledPastHero, setScrolledPastHero] = useState(false);
+  const [activeSection, setActiveSection] = useState("home");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const heroEl = document.getElementById("hero-section-container");
+    const heroObserver = new IntersectionObserver(
+      ([entry]) => {
+        setScrolledPastHero(!entry.isIntersecting);
+      },
+      { threshold: 0.05 }
+    );
+
+    if (heroEl) {
+      heroObserver.observe(heroEl);
+    }
+
+    const sections = ["about", "services", "work", "process", "contact"];
+    const sectionObservers = sections.map((id) => {
+      const el = document.getElementById(id);
+      if (!el) return null;
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setActiveSection(id);
+          }
+        },
+        { threshold: 0.15, rootMargin: "-25% 0px -45% 0px" }
+      );
+      observer.observe(el);
+      return { observer, el };
+    });
+
+    const handleScroll = () => {
+      if (window.scrollY < 180) {
+        setActiveSection("home");
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      if (heroEl) heroObserver.unobserve(heroEl);
+      sectionObservers.forEach((item) => {
+        if (item) item.observer.unobserve(item.el);
+      });
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  const navLinks = [
+    { label: "Home", href: "#" },
+    { label: "About", href: "#about" },
+    { label: "Services", href: "#services" },
+    { label: "Work", href: "#work" },
+    { label: "Process", href: "#process" },
+    { label: "Contact", href: "#contact" },
+  ];
+
+  return (
+    <>
+      <nav
+        className={`fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-7xl z-50 transition-all duration-500 ease-out ${
+          scrolledPastHero 
+            ? "translate-y-0 opacity-100 pointer-events-auto" 
+            : "-translate-y-4 opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className="w-full bg-[#0E0E0E]/60 backdrop-blur-lg border border-white/10 rounded-full py-2.5 md:py-4 px-4 md:px-8 flex items-center justify-between shadow-[0_16px_36px_rgba(0,0,0,0.5)]">
+          {/* Left: Logo / Branding */}
+          <a href="#" className="flex items-center gap-2 sm:gap-3">
+            <img src="/phoenix-icon.png" alt="Phoenix Labs Icon" className="h-5.5 md:h-8 w-auto object-contain" />
+            <span className="text-white text-xs md:text-base font-semibold tracking-[0.18em] uppercase font-sans">
+              Phoenix Labs
+            </span>
+            <span className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-accent animate-pulse" />
+          </a>
+
+          {/* Center: Nav links - Desktop Only */}
+          <div className="hidden md:flex items-center gap-8 lg:gap-10">
+            {navLinks.map((link) => {
+              const linkId = link.href === "#" ? "home" : link.href.substring(1);
+              const isActive = activeSection === linkId;
+              return (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  className={`text-[10px] md:text-xs font-mono tracking-wider uppercase transition-colors relative py-1 ${
+                    isActive ? "text-white font-bold" : "text-white/40 hover:text-white/70"
+                  }`}
+                >
+                  {link.label}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-accent rounded-full animate-pulse" />
+                  )}
+                </a>
+              );
+            })}
+          </div>
+
+          {/* Right: CTA / Hamburger */}
+          <div className="flex items-center gap-3">
+            <a
+              href="#contact"
+              className="text-[10px] md:text-xs font-mono tracking-wider uppercase font-bold px-4 py-2.5 md:px-7 md:py-3.5 rounded-full bg-gradient-to-r from-[#FE6B01] via-[#F32100] to-[#500700] hover:scale-105 active:scale-95 transition-all duration-200 shadow-[0_4px_12px_rgba(243,33,0,0.2)] text-white"
+            >
+              Get in Touch
+            </a>
+
+            {/* Hamburger Button - Mobile Only */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="flex md:hidden w-9 h-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+              aria-label="Toggle Menu"
+            >
+              {mobileMenuOpen ? <X size={16} /> : <Menu size={16} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Dropdown Menu */}
+        {mobileMenuOpen && (
+          <div className="absolute top-16 left-0 right-0 mx-2 bg-[#0E0E0E]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex flex-col gap-3 shadow-[0_16px_36px_rgba(0,0,0,0.6)] md:hidden pointer-events-auto">
+            {navLinks.map((link) => {
+              const linkId = link.href === "#" ? "home" : link.href.substring(1);
+              const isActive = activeSection === linkId;
+              return (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`text-[11px] font-mono tracking-widest uppercase p-3 rounded-lg flex items-center justify-between ${
+                    isActive ? "bg-accent/10 text-white font-bold" : "text-white/50 hover:bg-white/5"
+                  }`}
+                >
+                  {link.label}
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-accent" />}
+                </a>
+              );
+            })}
+          </div>
+        )}
+      </nav>
+    </>
+  );
+}
+
 export default function App() {
-  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const [activeIndex, setActiveIndex] = useState<number>(() => {
+    const params = new URLSearchParams(window.location.search);
+    const idx = parseInt(params.get("founder") || "0", 10);
+    return isNaN(idx) ? 0 : idx % 4;
+  });
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 640);
   const [processedImages, setProcessedImages] = useState<string[]>([]);
@@ -113,6 +266,34 @@ export default function App() {
 
   // Mouse tracking state for ambient glow effect
   const [mousePos, setMousePos] = useState({ x: "50%", y: "50%" });
+
+  // Touch tracking state for swipe navigation
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+    
+    if (isLeftSwipe) {
+      navigate("next");
+    } else if (isRightSwipe) {
+      navigate("prev");
+    }
+    
+    setTouchStart(null);
+    setTouchEnd(null);
+  };
 
   // Handle window resizing
   useEffect(() => {
@@ -182,10 +363,58 @@ export default function App() {
       baseBottom = "11vh";
     }
 
+    if (isMobile) {
+      const mobileHeight = "42vh";
+      const mobileBottom = "46vh";
+      switch (role) {
+        case "center":
+          return {
+            left: "50%",
+            transform: "translateX(-50%)",
+            height: mobileHeight,
+            bottom: mobileBottom,
+            opacity: 1,
+            filter: "blur(0px)",
+            zIndex: 20,
+          };
+        case "left":
+          return {
+            left: "5%",
+            transform: "translateX(-50%)",
+            height: mobileHeight,
+            bottom: mobileBottom,
+            opacity: 0.35,
+            filter: "blur(2.5px)",
+            zIndex: 10,
+          };
+        case "right":
+          return {
+            left: "95%",
+            transform: "translateX(-50%)",
+            height: mobileHeight,
+            bottom: mobileBottom,
+            opacity: 0.35,
+            filter: "blur(2.5px)",
+            zIndex: 10,
+          };
+        case "back":
+          return {
+            left: "50%",
+            transform: "translateX(-50%)",
+            height: mobileHeight,
+            bottom: mobileBottom,
+            opacity: 0,
+            filter: "blur(5px)",
+            zIndex: 0,
+          };
+      }
+    }
+
     switch (role) {
       case "center":
         return {
           left: "50%",
+          transform: "translateX(-50%)",
           height: baseHeight,
           bottom: baseBottom,
           opacity: 1,
@@ -194,7 +423,8 @@ export default function App() {
         };
       case "left":
         return {
-          left: isMobile ? "18%" : "30%",
+          left: "30%",
+          transform: "translateX(-50%)",
           height: baseHeight,
           bottom: baseBottom,
           opacity: 0.85,
@@ -203,7 +433,8 @@ export default function App() {
         };
       case "right":
         return {
-          left: isMobile ? "82%" : "70%",
+          left: "70%",
+          transform: "translateX(-50%)",
           height: baseHeight,
           bottom: baseBottom,
           opacity: 0.85,
@@ -213,6 +444,7 @@ export default function App() {
       case "back":
         return {
           left: "50%",
+          transform: "translateX(-50%)",
           height: baseHeight,
           bottom: baseBottom,
           opacity: 0.9,
@@ -233,16 +465,20 @@ export default function App() {
 
   return (
     <div className="w-full min-h-screen bg-[#0A0A0A] text-white">
+      <Navbar />
       {/* Hero Section Container (Exactly 100vh) */}
       <div
         ref={containerRef}
         onMouseMove={handleMouseMove}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        id="hero-section-container"
         className="relative w-full h-screen overflow-hidden select-none"
         style={{
           backgroundColor: activeFounder.bg,
           backgroundImage: "radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0.5) 100%)",
           transition: "background-color 650ms cubic-bezier(0.4, 0, 0.2, 1)",
-          // Pass mouse position variables to CSS
           // @ts-expect-error Custom CSS variables
           "--mouse-x": mousePos.x,
           "--mouse-y": mousePos.y,
@@ -266,15 +502,34 @@ export default function App() {
         {/* Subtle Studio Glow overlay */}
         <div className="absolute inset-0 ambient-glow z-30" />
 
-        {/* Top Left Branding */}
-        <div className="absolute top-6 left-6 z-30 flex items-center gap-2">
-          <span className="text-white text-xs font-semibold tracking-[0.18em] uppercase font-sans">
-            Phoenix Labs
-          </span>
-          <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+        {/* Top Header Bar */}
+        <div className="absolute top-4 sm:top-6 left-4 right-4 sm:left-6 sm:right-6 z-30 flex flex-row justify-between items-center gap-3">
+          {/* Logo / Wordmark */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <img src="/phoenix-icon.png" alt="Phoenix Labs Icon" className="h-6 sm:h-7 w-auto object-contain" />
+            <span className="text-white text-xs sm:text-sm font-semibold tracking-[0.18em] uppercase font-sans">
+              Phoenix Labs
+            </span>
+            <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+          </div>
+          
+          {/* View Our Work CTA - Mobile Only inside header to prevent desktop collision */}
+          <div className="flex items-center sm:hidden">
+            <a
+              href="#about"
+              className="group inline-flex items-center gap-2 text-white/90 hover:text-white transition-colors duration-200"
+            >
+              <span className="font-mono text-[10px] uppercase tracking-wider select-none">
+                View Our Work
+              </span>
+              <div className="w-6 h-6 rounded-full border border-white/20 flex items-center justify-center bg-white/5 group-hover:bg-white/10 group-hover:border-white/40 transition-colors duration-200">
+                <ArrowRight size={10} className="text-white group-hover:translate-x-0.5 transition-transform duration-200" />
+              </div>
+            </a>
+          </div>
         </div>
 
-        {/* Top Right "Edition" Tag to feel like a collectible */}
+        {/* Top Right "Edition" Tag to feel like a collectible - Desktop only */}
         <div className="absolute top-6 right-6 z-30 hidden sm:flex flex-col items-end opacity-60">
           <span className="text-[10px] text-white/80 font-mono tracking-widest uppercase">
             FOUNDERS EDITION
@@ -286,10 +541,10 @@ export default function App() {
 
         {/* Giant Background Typography */}
         <div
-          className="absolute w-full text-center z-1 pointer-events-none select-none overflow-hidden whitespace-nowrap uppercase font-display text-white/[0.08] tracking-[-0.02em] leading-none"
+          className="absolute w-full text-center z-1 pointer-events-none select-none overflow-hidden whitespace-nowrap uppercase font-display text-white/[0.04] sm:text-white/[0.08] tracking-[-0.02em] leading-none"
           style={{
-            fontSize: "clamp(80px, 20vw, 310px)",
-            top: "11%",
+            fontSize: isMobile ? "clamp(48px, 12vw, 80px)" : "clamp(80px, 20vw, 310px)",
+            top: isMobile ? "14%" : "11%",
           }}
         >
           Phoenix Labs
@@ -309,6 +564,7 @@ export default function App() {
                   className="absolute carousel-transition flex flex-col items-center justify-end pointer-events-auto"
                   style={{
                     left: style.left,
+                    transform: style.transform,
                     height: style.height,
                     bottom: style.bottom,
                     opacity: style.opacity,
@@ -336,9 +592,9 @@ export default function App() {
                     />
                   </div>
                   
-                  {/* Floating Nameplate System */}
+                  {/* Floating Nameplate System - hidden on mobile to avoid overlap */}
                   <div
-                    className="flex flex-col items-center justify-center text-center w-[280px] h-[20%] pointer-events-none select-none transition-opacity duration-500 ease-out mt-3"
+                    className="flex flex-col items-center justify-center text-center w-[280px] h-[20%] pointer-events-none select-none transition-opacity duration-500 ease-out mt-3 hidden sm:flex"
                     style={{
                       opacity: role === "center" ? 1 : role === "back" ? 0 : 0.4,
                     }}
@@ -356,7 +612,7 @@ export default function App() {
         </div>
 
         {/* Dynamic Pagination Dots Selector (Centered at bottom) */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-6 pointer-events-auto">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 hidden sm:flex items-center gap-6 pointer-events-auto">
           {FOUNDERS.map((_, idx) => (
             <button
               key={idx}
@@ -371,7 +627,7 @@ export default function App() {
               <span
                 className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
                   idx === activeIndex
-                    ? "bg-[#FF6B35] scale-125"
+                    ? "bg-accent scale-125"
                     : "bg-white/20 group-hover:bg-white/40"
                 }`}
               />
@@ -388,34 +644,37 @@ export default function App() {
           ))}
         </div>
 
-        {/* LEFT = Founder Story (Positioned at lower-left, aligning with pedestal floor) */}
+        {/* LEFT = Founder Story (Positioned at lower-left on desktop, stacked flex-column on mobile) */}
         <div 
-          className="absolute left-6 sm:left-12 md:left-16 lg:left-20 z-30 pointer-events-none flex flex-col justify-end w-full max-w-[420px]"
-          style={{ bottom: getPanelBottom() }}
+          className="absolute left-6 right-6 sm:right-auto sm:left-12 md:left-16 lg:left-20 z-30 pointer-events-none flex flex-col justify-end max-w-[420px]"
+          style={{ 
+            bottom: isMobile ? "4vh" : getPanelBottom(),
+            height: isMobile ? "38vh" : "auto"
+          }}
         >
-          <div className="pointer-events-auto flex flex-col">
+          <div className="pointer-events-auto flex flex-col h-full justify-between">
             {/* Animate change by keying on activeIndex */}
-            <div key={activeIndex} className="animate-fade-in-up flex flex-col">
-              <span className="text-white/40 text-[9px] font-mono tracking-widest uppercase flex items-center gap-1.5">
+            <div key={activeIndex} className="animate-fade-in-up flex flex-col gap-2">
+              <span className="text-white/40 text-[9px] font-mono tracking-widest uppercase flex items-center gap-1.5 justify-center sm:justify-start">
                 <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
                 FEATURED TALENT // 0{activeIndex + 1}
               </span>
               
-              {/* Reduced founder name size to clamp(3rem, 4vw, 5rem) */}
+              {/* Reduced founder name size for mobile */}
               <h2 
-                className="text-white font-display uppercase tracking-tighter leading-none mt-2 select-none"
-                style={{ fontSize: "clamp(3rem, 4vw, 5rem)" }}
+                className="text-white font-display uppercase tracking-tighter leading-none mt-1 select-none text-center sm:text-left"
+                style={{ fontSize: isMobile ? "2.5rem" : "clamp(3rem, 4vw, 5rem)" }}
               >
                 {activeFounder.name}
               </h2>
               
               {/* Tightened role spacing and role label size */}
-              <p className="text-white/95 font-sans font-semibold tracking-wide uppercase mt-1.5 text-xs sm:text-[14px]">
+              <p className="text-white/95 font-sans font-semibold tracking-wide uppercase text-xs sm:text-[14px] text-center sm:text-left">
                 {activeFounder.role}
               </p>
               
               {/* Core Skills Badges */}
-              <div className="flex flex-wrap gap-2 mt-2.5">
+              <div className="flex flex-wrap gap-2 mt-1 justify-center sm:justify-start">
                 {activeFounder.skills.map((skill) => (
                   <span
                     key={skill}
@@ -432,37 +691,73 @@ export default function App() {
               </p>
 
               {/* Inspirational Quote */}
-              <div className="hidden sm:flex items-stretch gap-3 mt-3.5 pl-3 border-l-2 border-[#FF6B35] max-w-[390px]">
+              <div className="hidden sm:flex items-stretch gap-3 mt-3.5 pl-3 border-l-2 border-accent max-w-[390px]">
                 <p className="text-white/60 italic text-[11px] sm:text-[12px] leading-relaxed font-sans py-0.5">
                   "{activeFounder.quote}"
                 </p>
               </div>
             </div>
 
-            {/* Navigation (Circular Buttons - aligned at bottom) */}
-            <div className="flex items-center gap-3 mt-5">
-              <button
-                onClick={() => navigate("prev")}
-                disabled={isAnimating}
-                className="w-10 h-10 rounded-full border-2 border-white flex items-center justify-center text-white transition-all duration-150 active:scale-95 hover:scale-108 hover:bg-white/12 disabled:opacity-40 disabled:cursor-not-allowed"
-                aria-label="Previous Founder"
-              >
-                <ArrowLeft size={16} strokeWidth={2.5} />
-              </button>
-              <button
-                onClick={() => navigate("next")}
-                disabled={isAnimating}
-                className="w-10 h-10 rounded-full border-2 border-white flex items-center justify-center text-white transition-all duration-150 active:scale-95 hover:scale-108 hover:bg-white/12 disabled:opacity-40 disabled:cursor-not-allowed"
-                aria-label="Next Founder"
-              >
-                <ArrowRight size={16} strokeWidth={2.5} />
-              </button>
+            {/* Navigation & Pagination stacked below on mobile */}
+            <div className="flex flex-col items-center sm:items-start gap-4 mt-2">
+              {/* Navigation (Circular Buttons) */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => navigate("prev")}
+                  disabled={isAnimating}
+                  className="w-11 h-11 sm:w-10 sm:h-10 rounded-full border-2 border-white flex items-center justify-center text-white transition-all duration-150 active:scale-95 hover:scale-108 hover:bg-white/12 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  aria-label="Previous Founder"
+                >
+                  <ArrowLeft size={18} strokeWidth={2.5} />
+                </button>
+                <button
+                  onClick={() => navigate("next")}
+                  disabled={isAnimating}
+                  className="w-11 h-11 sm:w-10 sm:h-10 rounded-full border-2 border-white flex items-center justify-center text-white transition-all duration-150 active:scale-95 hover:scale-108 hover:bg-white/12 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  aria-label="Next Founder"
+                >
+                  <ArrowRight size={18} strokeWidth={2.5} />
+                </button>
+              </div>
+
+              {/* Pagination Dots on Mobile */}
+              <div className="flex sm:hidden items-center gap-4 mt-1">
+                {FOUNDERS.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      if (isAnimating || idx === activeIndex) return;
+                      setIsAnimating(true);
+                      setActiveIndex(idx);
+                      setTimeout(() => setIsAnimating(false), 650);
+                    }}
+                    className="flex items-center gap-1.5 focus:outline-none group cursor-pointer"
+                  >
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                        idx === activeIndex
+                          ? "bg-accent scale-125"
+                          : "bg-white/20"
+                      }`}
+                    />
+                    <span
+                      className={`text-[10px] font-mono transition-all duration-300 ${
+                        idx === activeIndex
+                          ? "text-white font-bold"
+                          : "text-white/30"
+                      }`}
+                    >
+                      0{idx + 1}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* RIGHT = Primary CTA (Vertically centered right panel) */}
-        <div className="absolute right-6 sm:right-12 md:right-16 lg:right-20 top-1/2 -translate-y-1/2 z-30 pointer-events-auto">
+        {/* RIGHT = Primary CTA (Vertically centered right panel) - desktop only */}
+        <div className="absolute right-6 sm:right-12 md:right-16 lg:right-20 top-1/2 -translate-y-1/2 z-30 pointer-events-auto hidden sm:block">
           <a
             href="#about"
             className="group inline-flex items-center gap-3 text-white opacity-95 hover:opacity-100 transition-opacity duration-200"
@@ -477,62 +772,65 @@ export default function App() {
         </div>
       </div>
 
-      {/* Value Pillars Grid (Transition Block - positioned completely below the hero) */}
-      <div className="w-full bg-[#0A0A0A] py-16 border-t border-white/5 relative z-30">
-        <div className="max-w-7xl mx-auto px-6 sm:px-12 md:px-24">
-          <div className="bg-[#111111]/80 backdrop-blur-md border border-white/5 rounded-2xl p-6 md:p-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 shadow-[0_24px_48px_rgba(0,0,0,0.5)]">
-            <div className="flex flex-col gap-3">
-              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[#FF6B35]">
-                <Zap size={16} />
+      {/* Continuous Brand Gradient Container for all sections below Hero */}
+      <div className="w-full relative z-30 brand-gradient-bg">
+        {/* Value Pillars Grid (Transition Block - positioned completely below the hero) */}
+        <div className="w-full py-16 border-t border-white/5 relative z-30">
+          <div className="max-w-7xl mx-auto px-6 sm:px-12 md:px-24">
+            <div className="bg-[#111111]/80 backdrop-blur-md border border-white/5 rounded-2xl p-6 md:p-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 shadow-[0_24px_48px_rgba(0,0,0,0.5)]">
+              <div className="flex flex-col gap-3">
+                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-accent">
+                  <Zap size={16} />
+                </div>
+                <h4 className="text-white font-sans text-xs font-bold tracking-wider uppercase">Fast & Reliable</h4>
+                <p className="text-white/50 text-[11px] leading-relaxed">High performance solutions built for scale.</p>
               </div>
-              <h4 className="text-white font-sans text-xs font-bold tracking-wider uppercase">Fast & Reliable</h4>
-              <p className="text-white/50 text-[11px] leading-relaxed">High performance solutions built for scale.</p>
-            </div>
-            <div className="flex flex-col gap-3">
-              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[#FF6B35]">
-                <Code size={16} />
+              <div className="flex flex-col gap-3">
+                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-accent">
+                  <Code size={16} />
+                </div>
+                <h4 className="text-white font-sans text-xs font-bold tracking-wider uppercase">Modern Technology</h4>
+                <p className="text-white/50 text-[11px] leading-relaxed">We use the latest tools to build future-ready products.</p>
               </div>
-              <h4 className="text-white font-sans text-xs font-bold tracking-wider uppercase">Modern Technology</h4>
-              <p className="text-white/50 text-[11px] leading-relaxed">We use the latest tools to build future-ready products.</p>
-            </div>
-            <div className="flex flex-col gap-3">
-              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[#FF6B35]">
-                <Users size={16} />
+              <div className="flex flex-col gap-3">
+                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-accent">
+                  <Users size={16} />
+                </div>
+                <h4 className="text-white font-sans text-xs font-bold tracking-wider uppercase">Collaborative</h4>
+                <p className="text-white/50 text-[11px] leading-relaxed">We work closely with you from idea to launch.</p>
               </div>
-              <h4 className="text-white font-sans text-xs font-bold tracking-wider uppercase">Collaborative</h4>
-              <p className="text-white/50 text-[11px] leading-relaxed">We work closely with you from idea to launch.</p>
-            </div>
-            <div className="flex flex-col gap-3">
-              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[#FF6B35]">
-                <ShieldCheck size={16} />
+              <div className="flex flex-col gap-3">
+                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-accent">
+                  <ShieldCheck size={16} />
+                </div>
+                <h4 className="text-white font-sans text-xs font-bold tracking-wider uppercase">Quality Focused</h4>
+                <p className="text-white/50 text-[11px] leading-relaxed">Clean code, tested thoroughly, and built to last.</p>
               </div>
-              <h4 className="text-white font-sans text-xs font-bold tracking-wider uppercase">Quality Focused</h4>
-              <p className="text-white/50 text-[11px] leading-relaxed">Clean code, tested thoroughly, and built to last.</p>
             </div>
           </div>
         </div>
+
+        {/* About/Transition Section */}
+        <AboutSection />
+
+        {/* Services Section (Premium Symmetrical Grid) */}
+        <ServicesSection />
+
+        {/* Featured Work Case Studies Section */}
+        <FeaturedWorkSection />
+
+        {/* Why Phoenix Labs Section */}
+        <WhyPhoenixLabsSection />
+
+        {/* Our Process Section */}
+        <OurProcessSection />
+
+        {/* Project Estimator Section */}
+        <ProjectEstimatorSection />
+
+        {/* Final Cinematic Section & Footer */}
+        <FinalSection />
       </div>
-
-      {/* About/Transition Section */}
-      <AboutSection />
-
-      {/* Services Section (Premium Symmetrical Grid) */}
-      <ServicesSection />
-
-      {/* Featured Work Case Studies Section */}
-      <FeaturedWorkSection />
-
-      {/* Why Phoenix Labs Section */}
-      <WhyPhoenixLabsSection />
-
-      {/* Our Process Section */}
-      <OurProcessSection />
-
-      {/* Project Estimator Section */}
-      <ProjectEstimatorSection />
-
-      {/* Final Cinematic Section & Footer */}
-      <FinalSection />
     </div>
   );
 }
@@ -575,13 +873,13 @@ function AboutSection() {
     <section
       ref={sectionRef}
       id="about"
-      className="relative min-h-[75vh] bg-[#0A0A0A] px-6 py-20 sm:py-28 sm:px-12 md:px-24 flex flex-col md:flex-row gap-12 md:gap-24 border-t border-white/5 z-30"
+      className="relative min-h-[75vh] px-6 py-20 sm:py-28 sm:px-12 md:px-24 flex flex-col md:flex-row gap-12 md:gap-24 border-t border-white/5 z-30"
     >
       {/* Left Column - Sticky Section Label */}
       <div className="md:w-1/4 flex-shrink-0">
         <div className="md:sticky md:top-12">
           <span className="text-white/40 text-xs font-mono tracking-[0.25em] font-semibold uppercase flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-[#FF6B35] rounded-full animate-pulse" />
+            <span className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse" />
             01 / Who We Are
           </span>
         </div>
@@ -673,7 +971,7 @@ function ServicesSection() {
       id: "web-dev",
       title: "Web Development",
       description: "We craft ultra-fast, visually stunning React & Next.js websites. Engineered for sub-second loads, robust SEO, and fluid responsive layouts.",
-      icon: <Globe size={24} className="text-[#FF6B35]" />,
+      icon: <Globe size={24} className="text-accent" />,
       bullets: ["Headless Architectures", "Next.js & Vite Builds", "Performant Motion Design"],
       graphic: (
         <div className="absolute right-4 bottom-4 w-[35%] h-[50%] opacity-20 group-hover:opacity-30 transition-opacity duration-500 overflow-hidden pointer-events-none hidden md:block">
@@ -682,8 +980,8 @@ function ServicesSection() {
             <line x1="10" y1="60" x2="190" y2="60" stroke="currentColor" strokeWidth="0.5" strokeDasharray="3 3" />
             <line x1="10" y1="100" x2="190" y2="100" stroke="currentColor" strokeWidth="0.5" strokeDasharray="3 3" />
             <line x1="10" y1="140" x2="190" y2="140" stroke="currentColor" strokeWidth="0.5" strokeDasharray="3 3" />
-            <circle cx="100" cy="100" r="40" stroke="#FF6B35" strokeWidth="1" />
-            <circle cx="100" cy="100" r="55" stroke="#FF6B35" strokeWidth="0.5" strokeDasharray="2 2" />
+            <circle cx="100" cy="100" r="40" stroke="var(--color-accent)" strokeWidth="1" />
+            <circle cx="100" cy="100" r="55" stroke="var(--color-accent)" strokeWidth="0.5" strokeDasharray="2 2" />
             <path d="M70,100 L130,100 M100,70 L100,130" stroke="currentColor" strokeWidth="0.5" />
           </svg>
         </div>
@@ -693,13 +991,13 @@ function ServicesSection() {
       id: "design",
       title: "UI/UX Design",
       description: "Memorable design systems built in Figma. We balance creative graphics with strict usability guidelines to construct interfaces clients love.",
-      icon: <Palette size={24} className="text-[#FF6B35]" />,
+      icon: <Palette size={24} className="text-accent" />,
       bullets: ["Interactive Prototypes", "Premium Brand Systems", "Micro-Animations"],
       graphic: (
         <div className="absolute right-4 bottom-4 w-[38%] h-[40%] opacity-20 group-hover:opacity-30 transition-opacity duration-500 overflow-hidden pointer-events-none hidden md:block">
           <svg className="w-full h-full text-white" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="20" y="30" width="60" height="40" rx="4" stroke="currentColor" strokeWidth="0.5" />
-            <circle cx="140" cy="50" r="25" stroke="#FF6B35" strokeWidth="1" />
+            <circle cx="140" cy="50" r="25" stroke="var(--color-accent)" strokeWidth="1" />
             <path d="M70,50 L115,50" stroke="currentColor" strokeWidth="0.5" strokeDasharray="2 2" />
             <path d="M110,45 L115,50 L110,55" stroke="currentColor" strokeWidth="0.5" />
           </svg>
@@ -710,16 +1008,16 @@ function ServicesSection() {
       id: "saas",
       title: "SaaS Development",
       description: "Full-stack cloud products built to scale. Secure API pipelines, resilient database layers, and serverless compute pipelines.",
-      icon: <Server size={24} className="text-[#FF6B35]" />,
+      icon: <Server size={24} className="text-accent" />,
       bullets: ["Node.js & Serverless", "PostgreSQL & Redis", "Stripe Integrations"],
       graphic: (
         <div className="absolute right-4 bottom-4 w-[38%] h-[40%] opacity-20 group-hover:opacity-30 transition-opacity duration-500 overflow-hidden pointer-events-none hidden md:block">
           <svg className="w-full h-full text-white" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="40" y="10" width="120" height="20" rx="3" stroke="currentColor" strokeWidth="0.5" />
-            <rect x="40" y="40" width="120" height="20" rx="3" stroke="#FF6B35" strokeWidth="1" />
+            <rect x="40" y="40" width="120" height="20" rx="3" stroke="var(--color-accent)" strokeWidth="1" />
             <rect x="40" y="70" width="120" height="20" rx="3" stroke="currentColor" strokeWidth="0.5" />
             <circle cx="50" cy="20" r="2" fill="currentColor" />
-            <circle cx="50" cy="50" r="2" fill="#FF6B35" />
+            <circle cx="50" cy="50" r="2" fill="var(--color-accent)" />
             <circle cx="50" cy="80" r="2" fill="currentColor" />
           </svg>
         </div>
@@ -729,20 +1027,20 @@ function ServicesSection() {
       id: "growth",
       title: "Growth & Optimization",
       description: "Turn traffic into revenue. We optimize Lighthouse performance, configure advanced analytics, and boost conversion rates through quantitative engineering.",
-      icon: <TrendingUp size={24} className="text-[#FF6B35]" />,
+      icon: <TrendingUp size={24} className="text-accent" />,
       bullets: ["Lighthouse Optimization (99+)", "Conversion Strategy", "Custom Marketing Analytics"],
       graphic: (
         <div className="absolute right-4 bottom-4 w-[35%] h-[55%] opacity-20 group-hover:opacity-30 transition-opacity duration-500 overflow-hidden pointer-events-none hidden md:block">
           <svg className="w-full h-full text-white" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20,160 L60,120 L100,130 L140,70 L180,50" stroke="#FF6B35" strokeWidth="1.5" />
+            <path d="M20,160 L60,120 L100,130 L140,70 L180,50" stroke="var(--color-accent)" strokeWidth="1.5" />
             <path d="M20,160 L60,120 L100,130 L140,70 L180,50 L180,160 L20,160 Z" fill="url(#chartGrad)" opacity="0.1" />
             <line x1="20" y1="160" x2="180" y2="160" stroke="currentColor" strokeWidth="0.5" />
             <line x1="20" y1="40" x2="20" y2="160" stroke="currentColor" strokeWidth="0.5" />
-            <circle cx="180" cy="50" r="3" fill="#FF6B35" />
+            <circle cx="180" cy="50" r="3" fill="var(--color-accent)" />
             <defs>
               <linearGradient id="chartGrad" x1="100" y1="50" x2="100" y2="160" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#FF6B35" />
-                <stop offset="1" stopColor="#FF6B35" stopOpacity="0" />
+                <stop stopColor="#F32100" />
+                <stop offset="1" stopColor="#F32100" stopOpacity="0" />
               </linearGradient>
             </defs>
           </svg>
@@ -755,7 +1053,7 @@ function ServicesSection() {
     <section
       ref={sectionRef}
       id="services"
-      className="relative min-h-screen bg-[#0A0A0A] px-6 py-28 sm:py-36 sm:px-12 md:px-24 border-t border-white/5 z-30"
+      className="relative min-h-screen px-6 py-28 sm:py-36 sm:px-12 md:px-24 border-t border-white/5 z-30"
     >
       {/* Title block */}
       <div className={`flex flex-col md:flex-row gap-12 md:gap-24 mb-16 transition-all duration-1000 ease-out transform ${
@@ -764,7 +1062,7 @@ function ServicesSection() {
         {/* Left Column Label */}
         <div className="md:w-1/4 flex-shrink-0">
           <span className="text-white/40 text-xs font-mono tracking-[0.25em] font-semibold uppercase flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-[#FF6B35] rounded-full animate-pulse" />
+            <span className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse" />
             02 / Capabilities
           </span>
         </div>
@@ -788,8 +1086,12 @@ function ServicesSection() {
         {services.map((svc) => {
           const glow = glows[svc.id] || { x: "50%", y: "50%" };
           return (
-            <div
+            <ElectricBorder
               key={svc.id}
+              color="#F32100"
+              speed={0.3}
+              chaos={0.08}
+              borderRadius={28}
               onMouseMove={(e) => handleMouseMove(svc.id, e)}
               className="bento-card group p-6 sm:p-8 flex flex-col justify-between relative z-10 min-h-[300px] sm:min-h-[320px]"
               style={{
@@ -803,7 +1105,7 @@ function ServicesSection() {
               {/* Text content & tag pills wrapped inside a single container that is restricted to max 58% width on desktop to guarantee zero overlap */}
               <div className="relative z-10 flex-1 flex flex-col justify-between h-full w-full md:max-w-[58%]">
                 <div className="flex flex-col gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-[#FF6B35]/30 transition-colors duration-300">
+                  <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-accent/30 transition-colors duration-300">
                     {svc.icon}
                   </div>
                   <h4 className="text-white font-sans text-xl sm:text-2xl font-bold tracking-tight mt-2 uppercase">
@@ -826,7 +1128,7 @@ function ServicesSection() {
                   ))}
                 </div>
               </div>
-            </div>
+            </ElectricBorder>
           );
         })}
       </div>
@@ -840,11 +1142,11 @@ function ServicesSection() {
 
 function BmwMockup() {
   return (
-    <div className="relative w-full h-full bg-[#151515] rounded-xl overflow-hidden border border-white/5 flex flex-col justify-between p-4 group-hover:border-[#FF6B35]/25 transition-colors duration-500 animate-fade-in-up">
+    <div className="relative w-full h-full bg-[#151515] rounded-xl overflow-hidden border border-white/5 flex flex-col justify-between p-4 group-hover:border-accent/25 transition-colors duration-500 animate-fade-in-up">
       <div className="flex justify-between items-center border-b border-white/5 pb-2 text-[9px] font-mono text-white/40">
         <span>PHX-SIMULATOR // M5_PROTOTYPE</span>
-        <span className="flex items-center gap-1 text-[#FF6B35]">
-          <span className="w-1.5 h-1.5 bg-[#FF6B35] rounded-full animate-ping" />
+        <span className="flex items-center gap-1 text-accent">
+          <span className="w-1.5 h-1.5 bg-accent rounded-full animate-ping" />
           SPORT_MODE
         </span>
       </div>
@@ -852,20 +1154,20 @@ function BmwMockup() {
       <div className="flex-grow relative flex items-center justify-center py-4">
         {/* Speedometer gauge background */}
         <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full border border-dashed border-white/10 flex items-center justify-center relative">
-          <div className="absolute inset-1.5 rounded-full border border-[#FF6B35]/25 border-t-[#FF6B35] animate-spin" style={{ animationDuration: "12s" }} />
+          <div className="absolute inset-1.5 rounded-full border border-accent/25 border-t-accent animate-spin" style={{ animationDuration: "12s" }} />
           <div className="absolute inset-3 rounded-full border border-dashed border-white/5" />
           <div className="text-center relative z-10 flex flex-col">
-            <span className="text-2xl sm:text-3xl font-display tracking-tight text-white group-hover:text-[#FF6B35] transition-colors duration-300">284</span>
+            <span className="text-2xl sm:text-3xl font-display tracking-tight text-white group-hover:text-accent transition-colors duration-300">284</span>
             <span className="text-[7px] font-mono text-white/30 uppercase tracking-widest mt-0.5">KM/H</span>
           </div>
         </div>
 
         {/* Chassis wire outline lines */}
         <svg className="absolute inset-0 w-full h-full text-white/5 pointer-events-none" viewBox="0 0 300 150">
-          <path d="M 40,75 L 110,75 L 130,55 L 190,55 L 200,75 L 260,75" stroke="rgba(255,107,53,0.15)" strokeWidth="1" fill="none" strokeDasharray="4 2" />
+          <path d="M 40,75 L 110,75 L 130,55 L 190,55 L 200,75 L 260,75" stroke="rgba(243, 33, 0,0.15)" strokeWidth="1" fill="none" strokeDasharray="4 2" />
           <path d="M 110,75 L 120,95 L 185,95 L 195,75" stroke="rgba(255,255,255,0.08)" strokeWidth="1" fill="none" />
-          <circle cx="110" cy="75" r="2.5" fill="#FF6B35" />
-          <circle cx="200" cy="75" r="2.5" fill="#FF6B35" />
+          <circle cx="110" cy="75" r="2.5" fill="var(--color-accent)" />
+          <circle cx="200" cy="75" r="2.5" fill="var(--color-accent)" />
         </svg>
       </div>
 
@@ -876,7 +1178,7 @@ function BmwMockup() {
         </div>
         <div className="flex flex-col">
           <span>POWER</span>
-          <span className="text-[#FF6B35] font-bold mt-0.5">727 HP</span>
+          <span className="text-accent font-bold mt-0.5">727 HP</span>
         </div>
         <div className="flex flex-col">
           <span>TORQUE</span>
@@ -889,7 +1191,7 @@ function BmwMockup() {
 
 function OnePieceMockup() {
   return (
-    <div className="relative w-full h-full bg-[#151515] rounded-xl overflow-hidden border border-white/5 flex flex-col justify-between p-4 group-hover:border-[#FF6B35]/25 transition-colors duration-500 animate-fade-in-up">
+    <div className="relative w-full h-full bg-[#151515] rounded-xl overflow-hidden border border-white/5 flex flex-col justify-between p-4 group-hover:border-accent/25 transition-colors duration-500 animate-fade-in-up">
       <div className="flex justify-between items-center border-b border-white/5 pb-2 text-[9px] font-mono text-white/40">
         <span>CREATIVE CANVAS // GRAND_LINE_EXP</span>
         <span className="text-white/70">SYSTEM_OK</span>
@@ -899,7 +1201,7 @@ function OnePieceMockup() {
         {/* Left: Compass */}
         <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-white/10 flex items-center justify-center relative flex-shrink-0">
           <div className="absolute inset-1 rounded-full border border-dashed border-white/5" />
-          <div className="w-1.5 h-16 bg-gradient-to-b from-[#FF6B35] to-white/10 rotate-[45deg] group-hover:rotate-[225deg] transition-transform duration-1000 ease-in-out" />
+          <div className="w-1.5 h-16 bg-gradient-to-b from-accent to-white/10 rotate-[45deg] group-hover:rotate-[225deg] transition-transform duration-1000 ease-in-out" />
           <span className="absolute top-1 text-[7px] font-mono text-white/30">N</span>
           <span className="absolute bottom-1 text-[7px] font-mono text-white/30">S</span>
         </div>
@@ -908,15 +1210,15 @@ function OnePieceMockup() {
         <div className="flex-grow h-full border border-dashed border-white/5 rounded-lg p-2 bg-[#101010]/60 relative overflow-hidden flex flex-col justify-between">
           <div className="text-[7px] font-mono text-white/20">CANVAS_MAP_COORDS</div>
           
-          <svg className="absolute inset-0 w-full h-full text-[#FF6B35]/20" viewBox="0 0 150 80">
+          <svg className="absolute inset-0 w-full h-full text-accent/20" viewBox="0 0 150 80">
             <path d="M 0,20 L 150,20 M 0,40 L 150,40 M 0,60 L 150,60 M 30,0 L 30,80 M 60,0 L 60,80 M 90,0 L 90,80 M 120,0 L 120,80" stroke="rgba(255,255,255,0.015)" strokeWidth="0.5" />
-            <path d="M 20,60 Q 40,20 80,55 T 130,25" fill="none" stroke="#FF6B35" strokeWidth="1" strokeDasharray="3 3" />
-            <circle cx="20" cy="60" r="3.5" fill="#FF6B35" className="animate-pulse" />
-            <circle cx="20" cy="60" r="1.5" fill="#FF6B35" />
-            <circle cx="130" cy="25" r="2" fill="#FF6B35" />
+            <path d="M 20,60 Q 40,20 80,55 T 130,25" fill="none" stroke="var(--color-accent)" strokeWidth="1" strokeDasharray="3 3" />
+            <circle cx="20" cy="60" r="3.5" fill="var(--color-accent)" className="animate-pulse" />
+            <circle cx="20" cy="60" r="1.5" fill="var(--color-accent)" />
+            <circle cx="130" cy="25" r="2" fill="var(--color-accent)" />
           </svg>
 
-          <div className="text-[8px] font-mono text-[#FF6B35] font-bold self-end tracking-wider mt-auto">
+          <div className="text-[8px] font-mono text-accent font-bold self-end tracking-wider mt-auto">
             [AUDIO_ENGINE_ACTIVE]
           </div>
         </div>
@@ -932,7 +1234,7 @@ function OnePieceMockup() {
 
 function NQueenMockup() {
   return (
-    <div className="relative w-full h-full bg-[#151515] rounded-xl overflow-hidden border border-white/5 flex flex-col justify-between p-4 group-hover:border-[#FF6B35]/25 transition-colors duration-500 animate-fade-in-up">
+    <div className="relative w-full h-full bg-[#151515] rounded-xl overflow-hidden border border-white/5 flex flex-col justify-between p-4 group-hover:border-accent/25 transition-colors duration-500 animate-fade-in-up">
       <div className="flex justify-between items-center border-b border-white/5 pb-2 text-[9px] font-mono text-white/40">
         <span>ALGORITHM ENGINE // VISUALIZER</span>
         <span className="text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded text-[7px] font-bold">SOLVED_RUN</span>
@@ -954,7 +1256,7 @@ function NQueenMockup() {
                 key={i} 
                 className={`w-5 h-5 sm:w-6.5 sm:h-6.5 flex items-center justify-center text-[10px] transition-all duration-300 ${
                   hasQueen 
-                    ? "bg-[#FF6B35]/20 text-[#FF6B35] border border-[#FF6B35]/30 shadow-[0_0_8px_rgba(255,107,53,0.15)]" 
+                    ? "bg-accent/20 text-accent border border-accent/30 shadow-[0_0_8px_rgba(243, 33, 0,0.15)]" 
                     : isConflictPath 
                     ? "bg-red-500/10"
                     : isDark 
@@ -975,7 +1277,7 @@ function NQueenMockup() {
 
       <div className="border-t border-white/5 pt-2 grid grid-cols-2 gap-2 text-[8px] font-mono text-white/40">
         <div>ITERATIONS: <span className="text-white/80 font-bold">1.4K</span></div>
-        <div className="text-right">CALC: <span className="text-[#FF6B35] font-bold">0.82ms</span></div>
+        <div className="text-right">CALC: <span className="text-accent font-bold">0.82ms</span></div>
       </div>
     </div>
   );
@@ -983,10 +1285,10 @@ function NQueenMockup() {
 
 function DesertAiMockup() {
   return (
-    <div className="relative w-full h-full bg-[#151515] rounded-xl overflow-hidden border border-white/5 flex flex-col justify-between p-4 group-hover:border-[#FF6B35]/25 transition-colors duration-500 animate-fade-in-up">
+    <div className="relative w-full h-full bg-[#151515] rounded-xl overflow-hidden border border-white/5 flex flex-col justify-between p-4 group-hover:border-accent/25 transition-colors duration-500 animate-fade-in-up">
       <div className="flex justify-between items-center border-b border-white/5 pb-2 text-[9px] font-mono text-white/40">
         <span>NEURAL_NET_MODEL // INFERENCE</span>
-        <span className="text-[#FF6B35] font-bold">98.4% CONF</span>
+        <span className="text-accent font-bold">98.4% CONF</span>
       </div>
 
       <div className="flex-grow relative border border-white/5 rounded-lg my-2 bg-[#101010] overflow-hidden">
@@ -1001,16 +1303,16 @@ function DesertAiMockup() {
         </div>
 
         {/* Right half: Neural segmentation mask */}
-        <div className="absolute inset-y-0 right-0 w-1/2 bg-[#FF6B35]/5 flex flex-col justify-between p-2">
-          <span className="text-[6px] font-mono text-[#FF6B35]/70 uppercase text-right">SEGMENT_MASK</span>
+        <div className="absolute inset-y-0 right-0 w-1/2 bg-accent/5 flex flex-col justify-between p-2">
+          <span className="text-[6px] font-mono text-accent/70 uppercase text-right">SEGMENT_MASK</span>
           
-          <svg className="w-full h-2/3 text-[#FF6B35]/30" viewBox="0 0 100 50">
-            <path d="M 0,35 Q 25,10 55,25 T 100,5" fill="rgba(255,107,53,0.1)" stroke="#FF6B35" strokeWidth="1" />
-            <circle cx="45" cy="18" r="6" fill="rgba(255,107,53,0.15)" stroke="#FF6B35" strokeWidth="0.5" strokeDasharray="1.5 1" />
+          <svg className="w-full h-2/3 text-accent/30" viewBox="0 0 100 50">
+            <path d="M 0,35 Q 25,10 55,25 T 100,5" fill="rgba(243, 33, 0,0.1)" stroke="var(--color-accent)" strokeWidth="1" />
+            <circle cx="45" cy="18" r="6" fill="rgba(243, 33, 0,0.15)" stroke="var(--color-accent)" strokeWidth="0.5" strokeDasharray="1.5 1" />
           </svg>
         </div>
 
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#151515] border border-[#FF6B35]/30 rounded-full px-2 py-0.5 text-[7px] font-mono text-[#FF6B35] shadow-[0_0_8px_rgba(255,107,53,0.1)]">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#151515] border border-accent/30 rounded-full px-2 py-0.5 text-[7px] font-mono text-accent shadow-[0_0_8px_rgba(243, 33, 0,0.1)]">
           ONNX_IN_BROWSER
         </div>
       </div>
@@ -1025,7 +1327,7 @@ function DesertAiMockup() {
 
 function CampusAiMockup() {
   return (
-    <div className="relative w-full h-full bg-[#151515] rounded-xl overflow-hidden border border-white/5 flex flex-col justify-between p-4 group-hover:border-[#FF6B35]/25 transition-colors duration-500 animate-fade-in-up">
+    <div className="relative w-full h-full bg-[#151515] rounded-xl overflow-hidden border border-white/5 flex flex-col justify-between p-4 group-hover:border-accent/25 transition-colors duration-500 animate-fade-in-up">
       <div className="flex justify-between items-center border-b border-white/5 pb-2 text-[9px] font-mono text-white/40">
         <span>RAG_ORCHESTRATOR // PLATFORM</span>
         <span className="text-emerald-400 bg-emerald-500/10 px-1 rounded text-[7px]">AGENT_ONLINE</span>
@@ -1039,8 +1341,8 @@ function CampusAiMockup() {
         </div>
 
         {/* Assistant bubble */}
-        <div className="self-start bg-[#FF6B35]/10 border border-[#FF6B35]/20 rounded-lg rounded-tl-none px-2 py-1 max-w-[85%] flex flex-col">
-          <span className="text-[6px] font-mono text-[#FF6B35] uppercase">CAMPUS_AI // RAG</span>
+        <div className="self-start bg-accent/10 border border-accent/20 rounded-lg rounded-tl-none px-2 py-1 max-w-[85%] flex flex-col">
+          <span className="text-[6px] font-mono text-accent uppercase">CAMPUS_AI // RAG</span>
           <p className="text-[8px] text-white/80 leading-normal">Found Room 304 on Floor 3 available until 4:00 PM.</p>
         </div>
       </div>
@@ -1195,13 +1497,13 @@ function FeaturedWorkSection() {
   return (
     <section
       id="work"
-      className="relative min-h-screen bg-[#0A0A0A] px-6 py-28 sm:py-36 sm:px-12 md:px-24 border-t border-white/5 z-30"
+      className="relative min-h-screen px-6 py-28 sm:py-36 sm:px-12 md:px-24 border-t border-white/5 z-30"
     >
       {/* Title block */}
       <div className="flex flex-col md:flex-row gap-12 md:gap-24 mb-24">
         <div className="md:w-1/4 flex-shrink-0">
           <span className="text-white/40 text-xs font-mono tracking-[0.25em] font-semibold uppercase flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-[#FF6B35] rounded-full animate-pulse" />
+            <span className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse" />
             03 / Featured Work
           </span>
         </div>
@@ -1232,18 +1534,28 @@ function FeaturedWorkSection() {
                 isVisible ? "translate-y-0 opacity-100" : "translate-y-16 opacity-0"
               }`}
             >
-              {/* Visual Preview Container */}
-              <div className="w-full lg:w-1/2 aspect-[16/10] bg-[#111111] border border-white/5 rounded-2xl p-4 flex items-center justify-center relative overflow-hidden group shadow-[0_16px_36px_rgba(0,0,0,0.4)] hover:-translate-y-1.5 hover:border-[#FF6B35]/25 hover:shadow-[0_20px_48px_rgba(255,107,53,0.06)] transition-all duration-500">
-                <div className="w-full h-full transform group-hover:scale-[1.02] transition-transform duration-700 ease-out">
-                  {proj.mockup}
-                </div>
+              {/* Visual Preview Container wrapped with ElectricBorder */}
+              <div className="w-full lg:w-1/2 aspect-[16/10]">
+                <ElectricBorder
+                  color="#F32100"
+                  speed={0.3}
+                  chaos={0.08}
+                  borderRadius={16}
+                  className="w-full h-full"
+                >
+                  <div className="w-full h-full bg-[#111111] border border-white/5 rounded-2xl p-4 flex items-center justify-center relative overflow-hidden group shadow-[0_16px_36px_rgba(0,0,0,0.4)] hover:-translate-y-1.5 hover:border-accent/25 hover:shadow-[0_20px_48px_rgba(243, 33, 0,0.06)] transition-all duration-500">
+                    <div className="w-full h-full transform group-hover:scale-[1.02] transition-transform duration-700 ease-out">
+                      {proj.mockup}
+                    </div>
+                  </div>
+                </ElectricBorder>
               </div>
 
               {/* Content Area */}
               <div className="w-full lg:w-1/2 flex flex-col gap-5">
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center">
-                    <span className="px-2.5 py-0.5 text-[9px] tracking-wider font-mono font-bold uppercase border border-[#FF6B35]/30 bg-[#FF6B35]/10 text-[#FF6B35] rounded-md">
+                    <span className="px-2.5 py-0.5 text-[9px] tracking-wider font-mono font-bold uppercase border border-accent/30 bg-accent/10 text-accent rounded-md">
                       {proj.category}
                     </span>
                   </div>
@@ -1274,7 +1586,7 @@ function FeaturedWorkSection() {
                       key={highlight}
                       className="flex items-start gap-2.5 text-xs text-white/55 font-sans leading-normal"
                     >
-                      <span className="w-4 h-4 rounded-full bg-[#FF6B35]/10 border border-[#FF6B35]/30 flex items-center justify-center flex-shrink-0 text-[#FF6B35] mt-0.5">
+                      <span className="w-4 h-4 rounded-full bg-accent/10 border border-accent/30 flex items-center justify-center flex-shrink-0 text-accent mt-0.5">
                         <CheckCircle2 size={10} strokeWidth={3} />
                       </span>
                       <span>{highlight}</span>
@@ -1286,7 +1598,7 @@ function FeaturedWorkSection() {
                 <div className="flex items-center gap-4 mt-3">
                   <button
                     onClick={() => openGallery(proj.gallery, proj.title)}
-                    className="inline-flex items-center gap-1.5 px-4.5 py-2.5 bg-[#FF6B35] hover:bg-[#ff804d] text-white text-[10px] font-sans font-bold uppercase rounded-md tracking-wider transition-all duration-200 active:scale-95 shadow-[0_4px_12px_rgba(255,107,53,0.15)] cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-4.5 py-2.5 bg-accent hover:bg-accent-bright text-white text-[10px] font-sans font-bold uppercase rounded-md tracking-wider transition-all duration-200 active:scale-95 shadow-[0_4px_12px_rgba(243, 33, 0,0.15)] cursor-pointer"
                   >
                     View Project
                     <Search size={11} strokeWidth={2.5} />
@@ -1315,7 +1627,7 @@ function FeaturedWorkSection() {
             {/* Header: Title + Close */}
             <div className="w-full flex items-center justify-between mb-5">
               <div className="flex flex-col gap-1">
-                <span className="text-[#FF6B35] text-[9px] font-mono tracking-widest uppercase font-bold">Project Gallery</span>
+                <span className="text-accent text-[9px] font-mono tracking-widest uppercase font-bold">Project Gallery</span>
                 <h4 className="text-white font-sans text-lg sm:text-xl font-bold tracking-tight uppercase leading-none">{galleryTitle}</h4>
               </div>
               <button
@@ -1382,7 +1694,7 @@ function FeaturedWorkSection() {
                     onClick={() => setGalleryIndex(idx)}
                     className={`w-2 h-2 rounded-full transition-all duration-300 cursor-pointer ${
                       idx === galleryIndex
-                        ? "bg-[#FF6B35] scale-125"
+                        ? "bg-accent scale-125"
                         : "bg-white/20 hover:bg-white/40"
                     }`}
                     aria-label={`Go to image ${idx + 1}`}
@@ -1422,37 +1734,37 @@ const FEATURES = [
     id: "tech",
     title: "Modern Technology",
     description: "We use modern tools, frameworks, and best practices to create scalable digital products.",
-    icon: <Cpu size={24} className="text-[#FF6B35]" />
+    icon: <Cpu size={24} className="text-accent" />
   },
   {
     id: "perf",
     title: "Performance Focused",
     description: "Fast-loading, responsive experiences optimized for usability and growth.",
-    icon: <Zap size={24} className="text-[#FF6B35]" />
+    icon: <Zap size={24} className="text-accent" />
   },
   {
     id: "custom",
     title: "Custom Built",
     description: "Every project is designed around client goals rather than relying on generic templates.",
-    icon: <Layers size={24} className="text-[#FF6B35]" />
+    icon: <Layers size={24} className="text-accent" />
   },
   {
     id: "solvers",
     title: "Problem Solvers",
     description: "We approach projects as challenges to solve, not simply websites to build.",
-    icon: <Puzzle size={24} className="text-[#FF6B35]" />
+    icon: <Puzzle size={24} className="text-accent" />
   },
   {
     id: "ai",
     title: "AI & Automation",
     description: "Experience working with machine learning, automation, and intelligent systems.",
-    icon: <Brain size={24} className="text-[#FF6B35]" />
+    icon: <Brain size={24} className="text-accent" />
   },
   {
     id: "collab",
     title: "Collaborative Process",
     description: "Clients stay involved throughout planning, design, development, and launch.",
-    icon: <Users size={24} className="text-[#FF6B35]" />
+    icon: <Users size={24} className="text-accent" />
   }
 ];
 
@@ -1487,7 +1799,7 @@ function WhyPhoenixLabsSection() {
     <section
       ref={sectionRef}
       id="why-us"
-      className="relative min-h-screen bg-[#0A0A0A] px-6 py-28 sm:py-36 sm:px-12 md:px-24 border-t border-white/5 z-30 flex flex-col justify-between"
+      className="relative min-h-screen px-6 py-28 sm:py-36 sm:px-12 md:px-24 border-t border-white/5 z-30 flex flex-col justify-between"
     >
       {/* Header */}
       <div className={`flex flex-col md:flex-row gap-12 md:gap-24 mb-20 transition-all duration-1000 ease-out transform ${
@@ -1495,7 +1807,7 @@ function WhyPhoenixLabsSection() {
       }`}>
         <div className="md:w-1/4 flex-shrink-0">
           <span className="text-white/40 text-xs font-mono tracking-[0.25em] font-semibold uppercase flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-[#FF6B35] rounded-full animate-pulse" />
+            <span className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse" />
             04 / Why Phoenix Labs
           </span>
         </div>
@@ -1518,8 +1830,12 @@ function WhyPhoenixLabsSection() {
         {FEATURES.map((feat) => {
           const glow = glows[feat.id] || { x: "50%", y: "50%" };
           return (
-            <div
+            <ElectricBorder
               key={feat.id}
+              color="#F32100"
+              speed={0.3}
+              chaos={0.08}
+              borderRadius={28}
               onMouseMove={(e) => handleMouseMove(feat.id, e)}
               className="bento-card group p-6 sm:p-8 flex flex-col justify-start gap-5 relative z-10 min-h-[220px]"
               style={{
@@ -1529,7 +1845,7 @@ function WhyPhoenixLabsSection() {
               }}
             >
               {/* Icon Container */}
-              <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-[#FF6B35]/30 transition-colors duration-300">
+              <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-accent/30 transition-colors duration-300">
                 {feat.icon}
               </div>
 
@@ -1542,7 +1858,7 @@ function WhyPhoenixLabsSection() {
                   {feat.description}
                 </p>
               </div>
-            </div>
+            </ElectricBorder>
           );
         })}
       </div>
@@ -1553,7 +1869,7 @@ function WhyPhoenixLabsSection() {
           isIntersecting ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
         }`}
       >
-        <p className="text-2xl sm:text-4xl md:text-5xl font-display uppercase tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-[#FF6B35]/80 select-none">
+        <p className="text-2xl sm:text-4xl md:text-5xl font-display uppercase tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-accent/80 select-none">
           "We build products we'd be proud to use ourselves."
         </p>
       </div>
@@ -1764,7 +2080,7 @@ function OurProcessSection() {
     <section
       ref={sectionRef}
       id="process"
-      className="relative min-h-screen bg-[#0A0A0A] px-6 py-28 sm:py-36 sm:px-12 md:px-24 border-t border-white/5 z-30 overflow-hidden"
+      className="relative min-h-screen px-6 py-28 sm:py-36 sm:px-12 md:px-24 border-t border-white/5 z-30 overflow-hidden"
     >
       {/* Self-contained styling keyframes for wing sway and float parallax */}
       <style>{`
@@ -1814,7 +2130,7 @@ function OurProcessSection() {
       }`}>
         <div className="md:w-1/4 flex-shrink-0">
           <span className="text-white/40 text-xs font-mono tracking-[0.25em] font-semibold uppercase flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-[#FF6B35] rounded-full animate-pulse" />
+            <span className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse" />
             05 / Our Process
           </span>
         </div>
@@ -1846,7 +2162,7 @@ function OurProcessSection() {
         >
           {/* Soft Background Ambient Radial Glow */}
           <div
-            className="absolute inset-0 bg-[#FF6B35] rounded-full blur-[80px] pointer-events-none"
+            className="absolute inset-0 bg-accent rounded-full blur-[80px] pointer-events-none"
             style={{
               animation: "radialBreathe 4.5s ease-in-out infinite",
             }}
@@ -1854,10 +2170,10 @@ function OurProcessSection() {
 
           {/* Flying/Floating SVG container */}
           <div className="w-full h-full relative z-10" style={{ animation: "bgFloat 10s ease-in-out infinite" }}>
-            <svg className="w-full h-full text-[#FF6B35]" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg className="w-full h-full text-accent" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <linearGradient id="phoenix-bg-grad" x1="100" y1="20" x2="100" y2="190" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#FF6B35" />
+                  <stop stopColor="#F32100" />
                   <stop offset="1" stopColor="#FF8A4C" stopOpacity="0.4" />
                 </linearGradient>
                 <filter id="bg-glow" x="-30%" y="-30%" width="160%" height="160%">
@@ -1913,7 +2229,7 @@ function OurProcessSection() {
             ].map((p, pIdx) => (
               <div
                 key={pIdx}
-                className="absolute rounded-full bg-[#FF6B35] blur-[1px] pointer-events-none"
+                className="absolute rounded-full bg-accent blur-[1px] pointer-events-none"
                 style={{
                   left: `calc(50% + ${p.x})`,
                   top: p.y,
@@ -1954,7 +2270,7 @@ function OurProcessSection() {
               ref={fillPathRef}
               d={pathD}
               fill="none"
-              stroke="#FF6B35"
+              stroke="var(--color-accent)"
               strokeWidth="2"
               strokeLinecap="round"
               style={{
@@ -1974,7 +2290,7 @@ function OurProcessSection() {
                       cx={centerX}
                       cy={y}
                       r={18}
-                      className="fill-[#FF6B35]/15 stroke-none animate-ping pointer-events-none"
+                      className="fill-accent/15 stroke-none animate-ping pointer-events-none"
                       style={{
                         animationDuration: "1.6s",
                         transformOrigin: `${centerX}px ${y}px`,
@@ -1988,8 +2304,8 @@ function OurProcessSection() {
                     r={isCurrent ? 6 : isActivated ? 4.5 : 4.5}
                     className="transition-all duration-[400ms] ease-out"
                     style={{
-                      fill: isCurrent ? "#FF6B35" : isActivated ? "#FF6B35" : "#1c1c1c",
-                      stroke: isCurrent ? "rgba(255, 107, 53, 0.4)" : isActivated ? "rgba(255, 107, 53, 0.2)" : "rgba(255, 255, 255, 0.1)",
+                      fill: isCurrent ? "var(--color-accent)" : isActivated ? "var(--color-accent)" : "#1c1c1c",
+                      stroke: isCurrent ? "rgba(243, 33, 0, 0.4)" : isActivated ? "rgba(243, 33, 0, 0.2)" : "rgba(255, 255, 255, 0.1)",
                       strokeWidth: isCurrent ? "6px" : isActivated ? "4px" : "2px",
                     }}
                   />
@@ -2008,7 +2324,7 @@ function OurProcessSection() {
             >
               <path
                 d="M 0,-8 L 3,-1 L 10,-5 L 5,2 L 0,6 L -5,2 L -10,-5 L -3,-1 Z"
-                fill="#FF6B35"
+                fill="var(--color-accent)"
               />
             </g>
           </svg>
@@ -2040,11 +2356,15 @@ function OurProcessSection() {
             >
               {/* Card Container */}
               <div className="w-full md:w-[44%] pl-12 md:pl-0 z-20">
-                <div
+                <ElectricBorder
+                  color="#F32100"
+                  speed={0.3}
+                  chaos={0.08}
+                  borderRadius={28}
                   onMouseMove={(e) => handleMouseMove(idx, e)}
                   className={`bento-card group p-6 sm:p-8 flex flex-col gap-5 relative transition-all duration-[500ms] cursor-default ${
                     isCurrent 
-                      ? "border-[#FF6B35]/40 shadow-[0_0_24px_rgba(255,107,53,0.08)] bg-[#111111]/90" 
+                      ? "border-accent/40 shadow-[0_0_24px_rgba(243, 33, 0,0.08)] bg-[#111111]/90" 
                       : isActivated 
                       ? "border-white/10 bg-[#111111]/80"
                       : "border-white/5 bg-[#111111]/30"
@@ -2057,11 +2377,11 @@ function OurProcessSection() {
                 >
                   {/* Card Header (Icon & Step title) */}
                   <div className="flex items-center gap-3.5">
-                    <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-[#FF6B35] group-hover:border-[#FF6B35]/30 transition-colors duration-300">
+                    <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-accent group-hover:border-accent/30 transition-colors duration-300">
                       {step.icon}
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[#FF6B35] text-[9px] font-mono tracking-widest uppercase font-bold">
+                      <span className="text-accent text-[9px] font-mono tracking-widest uppercase font-bold">
                         STEP 0{idx + 1}
                       </span>
                       <h4 className="text-white font-sans text-lg font-bold tracking-tight uppercase leading-none mt-1">
@@ -2083,13 +2403,13 @@ function OurProcessSection() {
                     <ul className="flex flex-col gap-2">
                       {step.deliverables.map((del) => (
                         <li key={del} className="flex items-center gap-2 text-[10px] text-white/70 font-sans font-medium">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]/60 flex-shrink-0" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-accent/60 flex-shrink-0" />
                           {del}
                         </li>
                       ))}
                     </ul>
                   </div>
-                </div>
+                </ElectricBorder>
               </div>
             </div>
           );
@@ -2107,7 +2427,7 @@ function OurProcessSection() {
         </p>
         <a 
           href="#contact" 
-          className="group inline-flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-[#FF6B35] to-[#ff804d] hover:brightness-110 text-white text-xs font-sans font-bold uppercase rounded-md tracking-widest transition-all duration-200 active:scale-95 shadow-[0_4px_20px_rgba(255,107,53,0.2)]"
+          className="group inline-flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-accent to-accent-bright hover:brightness-110 text-white text-xs font-sans font-bold uppercase rounded-md tracking-widest transition-all duration-200 active:scale-95 shadow-[0_4px_20px_rgba(243, 33, 0,0.2)]"
         >
           <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform duration-200" />
         </a>
@@ -2319,7 +2639,7 @@ function ProjectEstimatorSection() {
       case "Medium":
         return <span className="px-2.5 py-1 text-[10px] font-mono tracking-wider uppercase font-bold rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">Medium</span>;
       case "High":
-        return <span className="px-2.5 py-1 text-[10px] font-mono tracking-wider uppercase font-bold rounded-full bg-[#FF6B35]/10 text-[#FF6B35] border border-[#FF6B35]/20">High</span>;
+        return <span className="px-2.5 py-1 text-[10px] font-mono tracking-wider uppercase font-bold rounded-full bg-accent/10 text-accent border border-accent/20">High</span>;
       case "Premium":
         return <span className="px-2.5 py-1 text-[10px] font-mono tracking-wider uppercase font-bold rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">Premium</span>;
       default:
@@ -2331,7 +2651,7 @@ function ProjectEstimatorSection() {
     <section
       ref={sectionRef}
       id="estimator"
-      className="relative min-h-screen bg-[#0A0A0A] px-6 py-28 sm:py-36 sm:px-12 md:px-24 border-t border-white/5 z-30"
+      className="relative min-h-screen px-6 py-28 sm:py-36 sm:px-12 md:px-24 border-t border-white/5 z-30"
     >
       {/* Header */}
       <div className={`flex flex-col md:flex-row gap-12 md:gap-24 mb-20 transition-all duration-1000 ease-out transform ${
@@ -2339,7 +2659,7 @@ function ProjectEstimatorSection() {
       }`}>
         <div className="md:w-1/4 flex-shrink-0">
           <span className="text-white/40 text-xs font-mono tracking-[0.25em] font-semibold uppercase flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-[#FF6B35] rounded-full animate-pulse" />
+            <span className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse" />
             06 / Project Estimator
           </span>
         </div>
@@ -2362,8 +2682,8 @@ function ProjectEstimatorSection() {
           
           {/* Step 1: Project Type */}
           <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-2 text-[#FF6B35]">
-              <span className="text-[10px] font-mono border border-[#FF6B35]/30 px-2 py-0.5 rounded-md uppercase font-bold tracking-wider">Step 1</span>
+            <div className="flex items-center gap-2 text-accent">
+              <span className="text-[10px] font-mono border border-accent/30 px-2 py-0.5 rounded-md uppercase font-bold tracking-wider">Step 1</span>
               <h4 className="text-white font-sans text-sm font-bold uppercase tracking-wider">Select Project Type</h4>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -2380,16 +2700,16 @@ function ProjectEstimatorSection() {
                     }}
                     className={`p-5 rounded-xl border flex flex-col gap-3 transition-all duration-[400ms] cursor-pointer relative overflow-hidden group ${
                       isActive
-                        ? "border-[#FF6B35] bg-[#111111]/90 shadow-[0_0_24px_rgba(255,107,53,0.06)]"
+                        ? "border-accent bg-[#111111]/90 shadow-[0_0_24px_rgba(243, 33, 0,0.06)]"
                         : "border-white/5 bg-[#111111]/30 hover:border-white/10 hover:bg-[#111111]/50"
                     }`}
                   >
                     {/* Glowing highlight reflection */}
-                    <div className={`absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#FF6B35] to-transparent transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-0"}`} />
+                    <div className={`absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-accent to-transparent transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-0"}`} />
                     
                     <div className="flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all duration-300 ${
-                        isActive ? "bg-[#FF6B35]/15 border-[#FF6B35]/40 text-[#FF6B35]" : "bg-white/5 border-white/10 text-white/50"
+                        isActive ? "bg-accent/15 border-accent/40 text-accent" : "bg-white/5 border-white/10 text-white/50"
                       }`}>
                         {type.icon}
                       </div>
@@ -2408,16 +2728,16 @@ function ProjectEstimatorSection() {
 
           {/* Step 2: Screen Count Slider */}
           <div className="flex flex-col gap-4 border-t border-white/5 pt-8">
-            <div className="flex items-center gap-2 text-[#FF6B35]">
-              <span className="text-[10px] font-mono border border-[#FF6B35]/30 px-2 py-0.5 rounded-md uppercase font-bold tracking-wider">Step 2</span>
+            <div className="flex items-center gap-2 text-accent">
+              <span className="text-[10px] font-mono border border-accent/30 px-2 py-0.5 rounded-md uppercase font-bold tracking-wider">Step 2</span>
               <h4 className="text-white font-sans text-sm font-bold uppercase tracking-wider">Estimated Number of Pages / Screens</h4>
             </div>
             
             <div className="bg-[#111111]/30 border border-white/5 p-6 rounded-xl flex flex-col gap-5">
               <div className="flex justify-between items-center">
                 <span className="text-white/60 text-xs font-mono uppercase tracking-wider">Pages / Screens count</span>
-                <div className="bg-[#FF6B35]/10 border border-[#FF6B35]/30 px-3 py-1 rounded-lg">
-                  <span className="text-[#FF6B35] text-sm font-mono font-bold">{pages}</span>
+                <div className="bg-accent/10 border border-accent/30 px-3 py-1 rounded-lg">
+                  <span className="text-accent text-sm font-mono font-bold">{pages}</span>
                 </div>
               </div>
               
@@ -2428,9 +2748,9 @@ function ProjectEstimatorSection() {
                   max="20"
                   value={pages}
                   onChange={(e) => setPages(parseInt(e.target.value))}
-                  className="w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-white/5 outline-none accent-[#FF6B35] transition-all duration-200"
+                  className="w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-white/5 outline-none accent-accent transition-all duration-200"
                   style={{
-                    background: `linear-gradient(to right, #FF6B35 0%, #FF6B35 ${(pages - 1) / 19 * 100}%, rgba(255, 255, 255, 0.05) ${(pages - 1) / 19 * 100}%, rgba(255, 255, 255, 0.05) 100%)`
+                    background: `linear-gradient(to right, var(--color-accent) 0%, var(--color-accent) ${(pages - 1) / 19 * 100}%, rgba(255, 255, 255, 0.05) ${(pages - 1) / 19 * 100}%, rgba(255, 255, 255, 0.05) 100%)`
                   }}
                 />
               </div>
@@ -2443,8 +2763,8 @@ function ProjectEstimatorSection() {
 
           {/* Step 3: Project Timeline Urgency */}
           <div className="flex flex-col gap-4 border-t border-white/5 pt-8">
-            <div className="flex items-center gap-2 text-[#FF6B35]">
-              <span className="text-[10px] font-mono border border-[#FF6B35]/30 px-2 py-0.5 rounded-md uppercase font-bold tracking-wider">Step 3</span>
+            <div className="flex items-center gap-2 text-accent">
+              <span className="text-[10px] font-mono border border-accent/30 px-2 py-0.5 rounded-md uppercase font-bold tracking-wider">Step 3</span>
               <h4 className="text-white font-sans text-sm font-bold uppercase tracking-wider">Timeline Flexibility</h4>
             </div>
 
@@ -2461,7 +2781,7 @@ function ProjectEstimatorSection() {
                     onClick={() => setTimeline(t.id as any)}
                     className={`py-3.5 px-3 rounded-lg flex flex-col items-center justify-center gap-1 transition-all duration-[350ms] border outline-none ${
                       isActive
-                        ? "bg-[#FF6B35] border-[#FF6B35] text-white shadow-[0_4px_16px_rgba(255,107,53,0.15)] scale-[1.01]"
+                        ? "bg-accent border-accent text-white shadow-[0_4px_16px_rgba(243, 33, 0,0.15)] scale-[1.01]"
                         : "bg-transparent border-transparent text-white/60 hover:text-white hover:bg-white/5"
                     }`}
                   >
@@ -2476,8 +2796,8 @@ function ProjectEstimatorSection() {
 
           {/* Step 4: Toggle Features */}
           <div className="flex flex-col gap-4 border-t border-white/5 pt-8">
-            <div className="flex items-center gap-2 text-[#FF6B35]">
-              <span className="text-[10px] font-mono border border-[#FF6B35]/30 px-2 py-0.5 rounded-md uppercase font-bold tracking-wider">Step 4</span>
+            <div className="flex items-center gap-2 text-accent">
+              <span className="text-[10px] font-mono border border-accent/30 px-2 py-0.5 rounded-md uppercase font-bold tracking-wider">Step 4</span>
               <h4 className="text-white font-sans text-sm font-bold uppercase tracking-wider">Select Add-on Features</h4>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -2489,16 +2809,16 @@ function ProjectEstimatorSection() {
                     onClick={() => toggleFeature(feat.id)}
                     className={`p-4 rounded-xl border flex flex-col gap-3.5 transition-all duration-[400ms] cursor-pointer relative overflow-hidden group select-none ${
                       isActive
-                        ? "border-[#FF6B35] bg-[#111111]/90 shadow-[0_0_20px_rgba(255,107,53,0.06)]"
+                        ? "border-accent bg-[#111111]/90 shadow-[0_0_20px_rgba(243, 33, 0,0.06)]"
                         : "border-white/5 bg-[#111111]/30 hover:border-white/10 hover:bg-[#111111]/50"
                     }`}
                   >
                     {/* Top Glow bar */}
-                    <div className={`absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#FF6B35] to-transparent transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-0"}`} />
+                    <div className={`absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent to-transparent transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-0"}`} />
 
                     <div className="flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all duration-300 ${
-                        isActive ? "bg-[#FF6B35]/15 border-[#FF6B35]/40 text-[#FF6B35]" : "bg-white/5 border-white/10 text-white/50"
+                        isActive ? "bg-accent/15 border-accent/40 text-accent" : "bg-white/5 border-white/10 text-white/50"
                       }`}>
                         {feat.icon}
                       </div>
@@ -2523,10 +2843,10 @@ function ProjectEstimatorSection() {
             {/* Live Output Panel Card */}
             <div className="w-full bg-[#111111]/80 border border-white/10 p-6 sm:p-8 rounded-2xl flex flex-col gap-7 backdrop-blur-md relative overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.5)]">
               {/* Stripe-style Top Glow line */}
-              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#FF6B35] to-transparent" />
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent" />
               
               <div className="flex flex-col gap-1.5">
-                <span className="text-[#FF6B35] text-[9px] font-mono tracking-widest uppercase font-bold">Live Estimate</span>
+                <span className="text-accent text-[9px] font-mono tracking-widest uppercase font-bold">Live Estimate</span>
                 <h4 className="text-white font-sans text-xl font-bold tracking-tight uppercase leading-none">Project Summary</h4>
               </div>
 
@@ -2572,7 +2892,7 @@ function ProjectEstimatorSection() {
                 {/* Budget display */}
                 <div className="flex flex-col gap-2 border-t border-white/5 pt-5">
                   <span className="text-white/40 text-[9px] font-mono tracking-wider uppercase font-bold">Estimated Budget Range</span>
-                  <div className="text-white font-sans text-xl sm:text-2xl font-bold tracking-tight leading-none text-[#FF6B35] flex flex-wrap items-center gap-1.5">
+                  <div className="text-white font-sans text-xl sm:text-2xl font-bold tracking-tight leading-none text-accent flex flex-wrap items-center gap-1.5">
                     <AnimatedCounter value={minPrice} formatter={formatCurrency} />
                     <span className="text-white/40 text-sm font-medium">—</span>
                     <AnimatedCounter value={maxPrice} formatter={formatCurrency} />
@@ -2584,7 +2904,7 @@ function ProjectEstimatorSection() {
               <div className="flex flex-col gap-3 mt-4">
                 <a
                   href="#contact"
-                  className="w-full py-4 bg-gradient-to-r from-[#FF6B35] to-[#ff804d] hover:brightness-110 active:scale-[0.98] text-white text-xs font-mono font-bold tracking-widest uppercase rounded-lg text-center transition-all duration-200 shadow-[0_4px_24px_rgba(255,107,53,0.18)] flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-gradient-to-r from-accent to-accent-bright hover:brightness-110 active:scale-[0.98] text-white text-xs font-mono font-bold tracking-widest uppercase rounded-lg text-center transition-all duration-200 shadow-[0_4px_24px_rgba(243, 33, 0,0.18)] flex items-center justify-center gap-2"
                 >
                   Book Scope Session
                   <ArrowRight size={13} />
@@ -2675,17 +2995,13 @@ function FinalSection() {
     };
   }, []);
 
-  const footerLinks = [
-    { label: "GitHub", url: "https://github.com/Bismeet" },
-    { label: "Instagram", url: "https://www.instagram.com/thelazydeveloper_" },
-    { label: "Email", url: "mailto:labsphoenix1@gmail.com" },
-  ] as const;
+
 
   return (
     <section
       ref={sectionRef}
       id="contact"
-      className="relative min-h-screen bg-[#0A0A0A] px-6 pt-24 pb-8 sm:px-12 md:px-24 flex flex-col justify-between border-t border-white/5 overflow-hidden z-30"
+      className="relative min-h-screen px-6 pt-24 pb-8 sm:px-12 md:px-24 flex flex-col justify-between border-t border-white/5 overflow-hidden z-30"
     >
       {/* Self-contained styling keyframes for final background float and link hover underline */}
       <style>{`
@@ -2704,8 +3020,8 @@ function FinalSection() {
           transition: color 300ms ease, text-shadow 300ms ease;
         }
         .contact-link:hover {
-          color: #FF6B35;
-          text-shadow: 0 0 8px rgba(255, 107, 53, 0.4);
+          color: var(--color-accent);
+          text-shadow: 0 0 8px rgba(243, 33, 0, 0.4);
         }
         .contact-link::after {
           content: '';
@@ -2715,7 +3031,7 @@ function FinalSection() {
           height: 1px;
           bottom: -4px;
           left: 0;
-          background-color: #FF6B35;
+          background-color: var(--color-accent);
           transform-origin: bottom right;
           transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -2727,7 +3043,7 @@ function FinalSection() {
 
       {/* Ambient background light pulse */}
       <div
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-[#FF6B35] rounded-full blur-[140px] pointer-events-none z-0"
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-accent rounded-full blur-[140px] pointer-events-none z-0"
         style={{
           animation: "ambientLightPulse 10s ease-in-out infinite",
         }}
@@ -2753,7 +3069,7 @@ function FinalSection() {
             </filter>
           </defs>
 
-          <g stroke="#FF6B35" strokeWidth="1.2" fill="none" filter="url(#final-bg-glow)" transform="rotate(180, 100, 100)">
+          <g stroke="var(--color-accent)" strokeWidth="1.2" fill="none" filter="url(#final-bg-glow)" transform="rotate(180, 100, 100)">
             {/* Torso / Body */}
             <polygon points="100,60 110,85 100,140 90,85" />
 
@@ -2815,7 +3131,7 @@ function FinalSection() {
         >
           <a
             href="mailto:labsphoenix1@gmail.com"
-            className="px-8 py-3.5 bg-gradient-to-r from-[#FF6B35] to-[#ff804d] hover:brightness-110 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(255,107,53,0.25)] text-white text-xs font-mono font-bold uppercase rounded-lg tracking-widest transition-all duration-300 active:scale-95 text-center"
+            className="px-8 py-3.5 bg-gradient-to-r from-accent to-accent-bright hover:brightness-110 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(243, 33, 0,0.25)] text-white text-xs font-mono font-bold uppercase rounded-lg tracking-widest transition-all duration-300 active:scale-95 text-center"
           >
             Start Your Project →
           </a>
@@ -2833,13 +3149,13 @@ function FinalSection() {
             href="https://github.com/Bismeet"
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative flex flex-col items-center gap-5 p-8 sm:p-10 bg-[#111111]/70 border border-white/5 rounded-2xl backdrop-blur-md overflow-hidden transition-all duration-[400ms] hover:border-[#FF6B35]/30 hover:-translate-y-1.5 hover:shadow-[0_12px_40px_rgba(255,107,53,0.08)]"
+            className="group relative flex flex-col items-center gap-5 p-8 sm:p-10 bg-[#111111]/70 border border-white/5 rounded-2xl backdrop-blur-md overflow-hidden transition-all duration-[400ms] hover:border-accent/30 hover:-translate-y-1.5 hover:shadow-[0_12px_40px_rgba(243, 33, 0,0.08)]"
           >
             {/* Top glow line */}
-            <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#FF6B35] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-accent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
-            {/* Icon container */}
-            <div className="w-16 h-16 rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center text-white/50 group-hover:text-[#FF6B35] group-hover:border-[#FF6B35]/30 group-hover:bg-[#FF6B35]/10 group-hover:shadow-[0_0_20px_rgba(255,107,53,0.12)] transition-all duration-[400ms]">
+            {/* Icon container - Claymorphism 3D squircle */}
+            <div className="w-16 h-16 flex items-center justify-center text-white rounded-[19px] bg-gradient-to-br from-[#2c2c2c] to-[#111111] shadow-[inset_1.5px_1.5px_3px_rgba(255,255,255,0.35),inset_-1.5px_-1.5px_3px_rgba(0,0,0,0.45),0_8px_18px_rgba(0,0,0,0.55)] relative overflow-hidden transition-all duration-[400ms] group-hover:scale-108 group-hover:-translate-y-1 after:absolute after:inset-0 after:bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.25)_0%,rgba(255,255,255,0)_55%)]">
               <GithubIcon size={28} />
             </div>
             
@@ -2850,44 +3166,44 @@ function FinalSection() {
             </div>
             
             {/* Subtle arrow indicator */}
-            <span className="text-white/20 text-[10px] font-mono tracking-wider uppercase group-hover:text-[#FF6B35]/60 transition-colors duration-300">View Profile →</span>
+            <span className="text-white/20 text-[10px] font-mono tracking-wider uppercase group-hover:text-accent/60 transition-colors duration-300">View Profile →</span>
           </a>
 
           {/* Instagram Card */}
           <a
-            href="https://www.instagram.com/thelazydeveloper_"
+            href="https://www.instagram.com/phoenixlabs.in?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative flex flex-col items-center gap-5 p-8 sm:p-10 bg-[#111111]/70 border border-white/5 rounded-2xl backdrop-blur-md overflow-hidden transition-all duration-[400ms] hover:border-[#FF6B35]/30 hover:-translate-y-1.5 hover:shadow-[0_12px_40px_rgba(255,107,53,0.08)]"
+            className="group relative flex flex-col items-center gap-5 p-8 sm:p-10 bg-[#111111]/70 border border-white/5 rounded-2xl backdrop-blur-md overflow-hidden transition-all duration-[400ms] hover:border-accent/30 hover:-translate-y-1.5 hover:shadow-[0_12px_40px_rgba(243, 33, 0,0.08)]"
           >
             {/* Top glow line */}
-            <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#FF6B35] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-accent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
-            {/* Icon container */}
-            <div className="w-16 h-16 rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center text-white/50 group-hover:text-[#FF6B35] group-hover:border-[#FF6B35]/30 group-hover:bg-[#FF6B35]/10 group-hover:shadow-[0_0_20px_rgba(255,107,53,0.12)] transition-all duration-[400ms]">
+            {/* Icon container - Claymorphism 3D squircle */}
+            <div className="w-16 h-16 flex items-center justify-center text-white rounded-[19px] bg-gradient-to-br from-[#F58529] via-[#DD2A7B] to-[#8134AF] shadow-[inset_1.5px_1.5px_3px_rgba(255,255,255,0.45),inset_-1.5px_-1.5px_3px_rgba(0,0,0,0.3),0_8px_18px_rgba(221,42,123,0.35)] relative overflow-hidden transition-all duration-[400ms] group-hover:scale-108 group-hover:-translate-y-1 after:absolute after:inset-0 after:bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.45)_0%,rgba(255,255,255,0)_55%)]">
               <InstagramIcon size={28} />
             </div>
             
             {/* Label */}
             <div className="flex flex-col items-center gap-1.5">
               <span className="text-white font-sans text-sm font-bold uppercase tracking-wider">Instagram</span>
-              <span className="text-white/40 text-[11px] font-mono tracking-wide">@thelazydeveloper_</span>
+              <span className="text-white/40 text-[11px] font-mono tracking-wide">@phoenixlabs.in</span>
             </div>
             
             {/* Subtle arrow indicator */}
-            <span className="text-white/20 text-[10px] font-mono tracking-wider uppercase group-hover:text-[#FF6B35]/60 transition-colors duration-300">Follow Us →</span>
+            <span className="text-white/20 text-[10px] font-mono tracking-wider uppercase group-hover:text-accent/60 transition-colors duration-300">Follow Us →</span>
           </a>
 
           {/* Email Card */}
           <a
             href="mailto:labsphoenix1@gmail.com"
-            className="group relative flex flex-col items-center gap-5 p-8 sm:p-10 bg-[#111111]/70 border border-white/5 rounded-2xl backdrop-blur-md overflow-hidden transition-all duration-[400ms] hover:border-[#FF6B35]/30 hover:-translate-y-1.5 hover:shadow-[0_12px_40px_rgba(255,107,53,0.08)]"
+            className="group relative flex flex-col items-center gap-5 p-8 sm:p-10 bg-[#111111]/70 border border-white/5 rounded-2xl backdrop-blur-md overflow-hidden transition-all duration-[400ms] hover:border-accent/30 hover:-translate-y-1.5 hover:shadow-[0_12px_40px_rgba(243, 33, 0,0.08)]"
           >
             {/* Top glow line */}
-            <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#FF6B35] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-accent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
-            {/* Icon container */}
-            <div className="w-16 h-16 rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center text-white/50 group-hover:text-[#FF6B35] group-hover:border-[#FF6B35]/30 group-hover:bg-[#FF6B35]/10 group-hover:shadow-[0_0_20px_rgba(255,107,53,0.12)] transition-all duration-[400ms]">
+            {/* Icon container - Claymorphism 3D squircle */}
+            <div className="w-16 h-16 flex items-center justify-center text-white rounded-[19px] bg-gradient-to-br from-[#FE6B01] via-[#F32100] to-[#500700] shadow-[inset_1.5px_1.5px_3px_rgba(255,255,255,0.45),inset_-1.5px_-1.5px_3px_rgba(0,0,0,0.3),0_8px_18px_rgba(243,33,0,0.35)] relative overflow-hidden transition-all duration-[400ms] group-hover:scale-108 group-hover:-translate-y-1 after:absolute after:inset-0 after:bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.45)_0%,rgba(255,255,255,0)_55%)]">
               <MailIcon size={28} />
             </div>
             
@@ -2898,7 +3214,7 @@ function FinalSection() {
             </div>
             
             {/* Subtle arrow indicator */}
-            <span className="text-white/20 text-[10px] font-mono tracking-wider uppercase group-hover:text-[#FF6B35]/60 transition-colors duration-300">Send Email →</span>
+            <span className="text-white/20 text-[10px] font-mono tracking-wider uppercase group-hover:text-accent/60 transition-colors duration-300">Send Email →</span>
           </a>
         </div>
       </div>
@@ -2909,23 +3225,42 @@ function FinalSection() {
           isIntersecting ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
         }`}
       >
-        <div className="flex items-center gap-1.5 order-2 sm:order-1">
-          <span>© 2026 Phoenix Labs</span>
+        <div className="flex items-center gap-2 sm:gap-3 order-2 sm:order-1">
+          <img src="/phoenix-icon.png" alt="Phoenix Labs Icon" className="h-4.5 w-auto object-contain" />
+          <span className="text-white font-sans font-semibold tracking-wider uppercase text-[10px]">
+            Phoenix Labs
+          </span>
+          <span className="w-1 h-1 rounded-full bg-accent animate-pulse" />
+          <span className="text-white/40 ml-1">© 2026</span>
         </div>
         
-        {/* Footer social links (Only GitHub, Instagram, Email) */}
-        <div className="flex items-center gap-6 order-1 sm:order-2">
-          {footerLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.url}
-              target={link.url.startsWith("http") ? "_blank" : undefined}
-              rel="noopener noreferrer"
-              className="contact-link text-white/40 hover:text-white transition-colors py-1 font-mono tracking-wider uppercase text-[9px]"
-            >
-              {link.label}
-            </a>
-          ))}
+        {/* Footer social links (Claymorphism 3D Badge Tray) */}
+        <div className="order-1 sm:order-2 social-tray">
+          <a
+            href="https://github.com/Bismeet"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="clay-badge clay-badge-github"
+            title="GitHub"
+          >
+            <GithubIcon size={18} />
+          </a>
+          <a
+            href="https://www.instagram.com/phoenixlabs.in?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+            target="_blank"
+            rel="noopener noreferrer"
+            className="clay-badge clay-badge-instagram"
+            title="Instagram"
+          >
+            <InstagramIcon size={18} />
+          </a>
+          <a
+            href="mailto:labsphoenix1@gmail.com"
+            className="clay-badge clay-badge-mail"
+            title="Email"
+          >
+            <MailIcon size={18} />
+          </a>
         </div>
 
         <span className="order-3 text-center sm:text-right">Building Websites, Web Apps & SaaS Products That Scale</span>

@@ -3,6 +3,12 @@
 @theme {
   --font-display: "Anton", sans-serif;
   --font-sans: "Inter", sans-serif;
+  --color-bg: #010101;
+  --color-accent-deep: #500700;
+  --color-accent: #F32100;
+  --color-accent-bright: #FE6B01;
+  --color-accent-warm: #FC5A09;
+  --color-wordmark-white: #F9F5F6;
 }
 
 html {
@@ -16,8 +22,8 @@ html {
     padding: 0;
     overflow-x: hidden;
     overflow-y: auto;
-    background-color: #0A0A0A;
-    color: #FFFFFF;
+    background-color: var(--color-bg);
+    color: var(--color-wordmark-white);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     width: 100%;
@@ -33,7 +39,7 @@ html {
 
 /* Custom cursor tracker and ambient glow */
 .ambient-glow {
-  background: radial-gradient(circle 600px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.05), transparent 80%);
+  background: radial-gradient(circle 600px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(254, 107, 1, 0.04) 0%, rgba(80, 7, 0, 0.08) 50%, transparent 80%);
   pointer-events: none;
 }
 
@@ -78,15 +84,15 @@ html {
 
 .bento-card:hover {
   transform: translateY(-6px);
-  border-color: rgba(255, 107, 53, 0.25);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55), 0 0 30px rgba(255, 107, 53, 0.06);
+  border-color: rgba(243, 33, 0, 0.25);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55), 0 0 30px rgba(243, 33, 0, 0.06);
 }
 
 .bento-card::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle 350px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 107, 53, 0.12), transparent 80%);
+  background: radial-gradient(circle 350px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(254, 107, 1, 0.15) 0%, rgba(80, 7, 0, 0.25) 50%, transparent 80%);
   opacity: 0;
   transition: opacity 350ms ease;
   pointer-events: none;
@@ -95,6 +101,67 @@ html {
 
 .bento-card:hover::before {
   opacity: 1;
+}
+
+.brand-gradient-bg {
+  background: linear-gradient(135deg, #010101 0%, #1c0200 40%, #500700 75%, #FC5A09 100%);
+  background-attachment: fixed;
+}
+
+.social-tray {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  padding: 8px 16px;
+}
+
+.clay-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px; /* ~30% of size (13px of 44px) */
+  color: #ffffff;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.clay-badge:hover {
+  transform: translateY(-4px) scale(1.08);
+}
+
+.clay-badge-instagram {
+  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 55%), linear-gradient(135deg, #F58529 0%, #DD2A7B 50%, #8134AF 100%);
+  box-shadow: inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.4), inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.3), 0 6px 14px rgba(221, 42, 123, 0.3);
+}
+
+.clay-badge-instagram:hover {
+  box-shadow: inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.5), inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.2), 0 10px 22px rgba(221, 42, 123, 0.45);
+}
+
+.clay-badge-github {
+  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 55%), linear-gradient(135deg, #2b2b2b 0%, #111111 100%);
+  box-shadow: inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.3), inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.4), 0 6px 14px rgba(0, 0, 0, 0.55);
+}
+
+.clay-badge-github:hover {
+  box-shadow: inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.4), inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.3), 0 10px 22px rgba(0, 0, 0, 0.7);
+}
+
+.clay-badge-mail {
+  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 55%), linear-gradient(135deg, #FE6B01 0%, #F32100 50%, #500700 100%);
+  box-shadow: inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.4), inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.3), 0 6px 14px rgba(243, 33, 0, 0.3);
+}
+
+.clay-badge-mail:hover {
+  box-shadow: inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.5), inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.2), 0 10px 22px rgba(243, 33, 0, 0.45);
 }
 
 
