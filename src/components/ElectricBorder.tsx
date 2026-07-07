@@ -28,7 +28,7 @@ interface ElectricBorderProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const ElectricBorder: React.FC<ElectricBorderProps> = ({
   children,
-  color = '#F32100',
+  color = '#FF6B35',
   speed = 0.3,
   chaos = 0.08,
   borderRadius = 16,
@@ -41,6 +41,7 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
   const animationRef = useRef<number | null>(null);
   const timeRef = useRef(0);
   const lastFrameTimeRef = useRef(0);
+  const lastPaintTimeRef = useRef(0);
 
   const random = useCallback((x: number): number => {
     return (Math.sin(x * 12.9898) * 43758.5453) % 1;
@@ -178,37 +179,61 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const octaves = 10;
+    const desktopOctaves = 6;
+    const mobileOctaves = 4;
     const lacunarity = 1.6;
     const gain = 0.7;
     const baseFlatness = 0;
-    const displacement = 60;
-    const borderOffset = 60;
 
     let isVisible = false;
+    let isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let borderOffset = window.innerWidth < 768 ? 32 : 52;
+
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const getDpr = () => Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.15 : 1.5);
+
+    const stopAnimation = () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+    };
 
     const updateSize = () => {
+      borderOffset = window.innerWidth < 768 ? 32 : 52;
+      container.style.setProperty('--electric-border-offset', `${borderOffset}px`);
+
       const w = container.clientWidth;
       const h = container.clientHeight;
       const width = w + borderOffset * 2;
       const height = h + borderOffset * 2;
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      ctx.scale(dpr, dpr);
+      const dpr = getDpr();
+      canvas.width = Math.max(1, Math.round(width * dpr));
+      canvas.height = Math.max(1, Math.round(height * dpr));
 
       return { width, height };
     };
 
     let { width, height } = updateSize();
-    let lastDpr = Math.min(window.devicePixelRatio || 1, 2);
+    let lastDpr = getDpr();
 
     const drawElectricBorder = (currentTime: number) => {
       if (!canvas || !ctx) return;
-      if (!isVisible) return;
+      if (!isVisible || isReducedMotion) {
+        animationRef.current = null;
+        return;
+      }
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const isMobileView = window.innerWidth < 768;
+      const frameInterval = isMobileView ? 50 : 33;
+      if (currentTime - lastPaintTimeRef.current < frameInterval) {
+        animationRef.current = requestAnimationFrame(drawElectricBorder);
+        return;
+      }
+      lastPaintTimeRef.current = currentTime;
+
+      const dpr = getDpr();
       if (dpr !== lastDpr) {
         lastDpr = dpr;
         const newSize = updateSize();
@@ -216,20 +241,20 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
         height = newSize.height;
       }
 
-      const deltaTime = (currentTime - lastFrameTimeRef.current) / 1000;
+      const deltaTime = Math.min((currentTime - lastFrameTimeRef.current) / 1000, 0.05);
       timeRef.current += deltaTime * speed;
       lastFrameTimeRef.current = currentTime;
 
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.scale(dpr, dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, width, height);
 
       ctx.strokeStyle = color;
-      ctx.lineWidth = 1.5;
+      ctx.lineWidth = isMobileView ? 1 : 1.25;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 
-      const scale = displacement;
+      const scale = isMobileView ? 30 : 42;
+      const octaves = isMobileView ? mobileOctaves : desktopOctaves;
       const left = borderOffset;
       const top = borderOffset;
       const borderWidth = width - 2 * borderOffset;
@@ -238,7 +263,7 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
       const radius = Math.min(borderRadius, maxRadius);
 
       const approximatePerimeter = 2 * (borderWidth + borderHeight) + 2 * Math.PI * radius;
-      const sampleCount = Math.floor(approximatePerimeter / 2);
+      const sampleCount = Math.max(32, Math.min(isMobileView ? 140 : 240, Math.floor(approximatePerimeter / 4)));
 
       ctx.beginPath();
 
@@ -278,19 +303,24 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
       animationRef.current = requestAnimationFrame(drawElectricBorder);
     };
 
+    const startAnimation = () => {
+      if (animationRef.current || isReducedMotion || !isVisible) return;
+      lastFrameTimeRef.current = performance.now();
+      lastPaintTimeRef.current = 0;
+      animationRef.current = requestAnimationFrame(drawElectricBorder);
+    };
+
     const visibilityObserver = new IntersectionObserver(
       ([entry]) => {
         const wasVisible = isVisible;
         isVisible = entry.isIntersecting;
         if (isVisible && !wasVisible) {
-          lastFrameTimeRef.current = performance.now();
-          animationRef.current = requestAnimationFrame(drawElectricBorder);
-        } else if (!isVisible && animationRef.current) {
-          cancelAnimationFrame(animationRef.current);
-          animationRef.current = null;
+          startAnimation();
+        } else if (!isVisible) {
+          stopAnimation();
         }
       },
-      { threshold: 0.05 }
+      { rootMargin: '120px 0px', threshold: 0.01 }
     );
     visibilityObserver.observe(container);
 
@@ -301,12 +331,22 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
     });
     resizeObserver.observe(container);
 
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
+    const handleMotionChange = (event: MediaQueryListEvent) => {
+      isReducedMotion = event.matches;
+      if (isReducedMotion) {
+        stopAnimation();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      } else {
+        startAnimation();
       }
+    };
+    motionQuery.addEventListener('change', handleMotionChange);
+
+    return () => {
+      stopAnimation();
       visibilityObserver.disconnect();
       resizeObserver.disconnect();
+      motionQuery.removeEventListener('change', handleMotionChange);
     };
   }, [color, speed, chaos, borderRadius, octavedNoise, getRoundedRectPoint]);
 
@@ -314,7 +354,7 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
     <div
       ref={containerRef}
       className={`electric-border relative overflow-visible isolate ${className ?? ''}`}
-      style={{ '--electric-border-color': color, borderRadius, ...style } as CSSProperties}
+      style={{ '--electric-border-color': color, '--electric-border-offset': '52px', borderRadius, ...style } as CSSProperties}
       {...rest}
     >
       <div className="eb-canvas-container">
@@ -323,16 +363,16 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
       <div className="absolute inset-0 rounded-[inherit] pointer-events-none z-0">
         <div
           className="eb-glow-1 absolute inset-0 rounded-[inherit] pointer-events-none"
-          style={{ border: `2px solid ${hexToRgba(color, 0.4)}`, filter: 'blur(1.5px)' }}
+          style={{ border: `2px solid ${hexToRgba(color, 0.32)}`, filter: 'blur(1px)' }}
         />
         <div
           className="eb-glow-2 absolute inset-0 rounded-[inherit] pointer-events-none"
-          style={{ border: `2px solid ${color}`, filter: 'blur(4px)' }}
+          style={{ border: `2px solid ${color}`, filter: 'blur(2px)' }}
         />
         <div
-          className="eb-background-glow absolute inset-0 rounded-[inherit] pointer-events-none -z-[1] scale-110 opacity-30"
+          className="eb-background-glow absolute inset-0 rounded-[inherit] pointer-events-none -z-[1]"
           style={{
-            filter: 'blur(32px)',
+            filter: 'blur(18px)',
             background: `linear-gradient(-30deg, ${color}, transparent, ${color})`
           }}
         />

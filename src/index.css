@@ -4,10 +4,14 @@
   --font-display: "Anton", sans-serif;
   --font-sans: "Inter", sans-serif;
   --color-bg: #010101;
-  --color-accent-deep: #500700;
-  --color-accent: #F32100;
-  --color-accent-bright: #FE6B01;
-  --color-accent-warm: #FC5A09;
+  --color-accent-deep: #7A1E08;
+  --color-accent: #FF6B35;
+  --color-accent-bright: #FF7A1A;
+  --color-accent-warm: #FF8A3D;
+  --color-accent-soft: #FFB066;
+  --color-ember-shadow: #501506;
+  --color-charcoal: #151515;
+  --color-charcoal-soft: #1E1E1E;
   --color-wordmark-white: #F9F5F6;
 }
 
@@ -39,7 +43,7 @@ html {
 
 /* Custom cursor tracker and ambient glow */
 .ambient-glow {
-  background: radial-gradient(circle 600px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(254, 107, 1, 0.04) 0%, rgba(80, 7, 0, 0.08) 50%, transparent 80%);
+  background: radial-gradient(circle 600px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 122, 26, 0.05) 0%, rgba(122, 30, 8, 0.08) 50%, transparent 80%);
   pointer-events: none;
 }
 
@@ -70,6 +74,168 @@ html {
   animation: fadeInUp 500ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+@keyframes techOrbitSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes techCorePulse {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.75;
+  }
+}
+
+@keyframes techEmberFloat {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.75);
+    opacity: 0;
+  }
+  35% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate3d(16px, -44px, 0) scale(1.05);
+    opacity: 0;
+  }
+}
+
+@keyframes techOrbitItem {
+  from {
+    transform: rotate(var(--orbit-angle)) translateX(var(--orbit-radius)) rotate(calc(var(--orbit-angle) * -1));
+  }
+  to {
+    transform: rotate(calc(var(--orbit-angle) + 360deg)) translateX(var(--orbit-radius)) rotate(calc((var(--orbit-angle) + 360deg) * -1));
+  }
+}
+
+.tech-orbit-shell {
+  background: radial-gradient(circle at 50% 50%, rgba(255, 107, 53, 0.09), rgba(255, 255, 255, 0.035) 34%, transparent 62%);
+  box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.035);
+}
+
+.tech-orbit-ring {
+  position: absolute;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  animation: techOrbitSpin 36s linear infinite;
+}
+
+.tech-orbit-ring::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 107, 53, 0.18);
+  clip-path: polygon(0 0, 34% 0, 18% 100%, 0 100%);
+}
+
+.tech-orbit-spin {
+  transform-origin: center;
+}
+
+.tech-orbit-item {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: rotate(var(--orbit-angle)) translateX(var(--orbit-radius)) rotate(calc(var(--orbit-angle) * -1));
+  transform-origin: 0 0;
+  animation: techOrbitItem 48s linear infinite;
+}
+
+.tech-orbit-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 126px;
+  min-height: 58px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(17, 17, 17, 0.88), rgba(8, 8, 8, 0.74));
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  transition: transform 300ms ease, border-color 300ms ease, box-shadow 300ms ease, background 300ms ease;
+}
+
+.tech-orbit-card:hover {
+  transform: translateY(-5px) scale(1.04);
+  border-color: rgba(255, 107, 53, 0.42);
+  background: linear-gradient(135deg, rgba(24, 24, 24, 0.95), rgba(10, 10, 10, 0.82));
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 0 28px rgba(255, 107, 53, 0.12);
+}
+
+.tech-core-pulse {
+  animation: techCorePulse 3.8s ease-in-out infinite;
+}
+
+.tech-mobile-core {
+  box-shadow: 0 0 34px rgba(255, 107, 53, 0.13), inset 0 0 24px rgba(255, 176, 102, 0.06);
+}
+
+.tech-stack-ember {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--color-accent);
+  box-shadow: 0 0 16px rgba(255, 107, 53, 0.55);
+  opacity: 0;
+  animation: techEmberFloat 5.5s ease-in-out infinite;
+}
+
+.tech-motion-paused .tech-orbit-ring,
+.tech-motion-paused .tech-orbit-item,
+.tech-motion-paused .tech-core-pulse,
+.tech-motion-paused .tech-stack-ember {
+  animation-play-state: paused;
+}
+
+@media (max-width: 767px) {
+  .tech-orbit-ring,
+  .tech-orbit-item,
+  .tech-core-pulse,
+  .tech-stack-ember {
+    animation: none !important;
+  }
+
+  .tech-stack-ember {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tech-orbit-spin,
+  .tech-orbit-ring,
+  .tech-orbit-item,
+  .tech-core-pulse,
+  .tech-stack-ember {
+    animation: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
 /* Bento card styles */
 .bento-card {
   position: relative;
@@ -84,15 +250,15 @@ html {
 
 .bento-card:hover {
   transform: translateY(-6px);
-  border-color: rgba(243, 33, 0, 0.25);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55), 0 0 30px rgba(243, 33, 0, 0.06);
+  border-color: rgba(255, 107, 53, 0.28);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55), 0 0 30px rgba(255, 176, 102, 0.08);
 }
 
 .bento-card::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle 350px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(254, 107, 1, 0.15) 0%, rgba(80, 7, 0, 0.25) 50%, transparent 80%);
+  background: radial-gradient(circle 350px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 122, 26, 0.16) 0%, rgba(122, 30, 8, 0.18) 50%, transparent 80%);
   opacity: 0;
   transition: opacity 350ms ease;
   pointer-events: none;
@@ -103,9 +269,29 @@ html {
   opacity: 1;
 }
 
-.brand-gradient-bg {
-  background: linear-gradient(135deg, #010101 0%, #1c0200 40%, #500700 75%, #FC5A09 100%);
-  background-attachment: fixed;
+.phoenix-site-gradient,
+.brand-gradient-bg,
+.phoenix-dark-gradient {
+  background:
+    radial-gradient(circle at 85% 18%, rgba(255, 107, 53, 0.22), transparent 34%),
+    radial-gradient(circle at 95% 65%, rgba(255, 88, 20, 0.18), transparent 38%),
+    radial-gradient(circle at 18% 42%, rgba(255, 255, 255, 0.045), transparent 32%),
+    linear-gradient(
+      135deg,
+      #010101 0%,
+      #080808 24%,
+      #151515 46%,
+      #241008 68%,
+      #4a1507 100%
+    );
+}
+
+@media (min-width: 1024px) {
+  .phoenix-site-gradient,
+  .brand-gradient-bg,
+  .phoenix-dark-gradient {
+    background-attachment: fixed;
+  }
 }
 
 .social-tray {
@@ -138,12 +324,12 @@ html {
 }
 
 .clay-badge-instagram {
-  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 55%), linear-gradient(135deg, #F58529 0%, #DD2A7B 50%, #8134AF 100%);
-  box-shadow: inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.4), inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.3), 0 6px 14px rgba(221, 42, 123, 0.3);
+  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 55%), linear-gradient(135deg, var(--color-accent-soft) 0%, var(--color-accent-bright) 52%, var(--color-accent-deep) 100%);
+  box-shadow: inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.4), inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.3), 0 6px 14px rgba(255, 122, 26, 0.3);
 }
 
 .clay-badge-instagram:hover {
-  box-shadow: inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.5), inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.2), 0 10px 22px rgba(221, 42, 123, 0.45);
+  box-shadow: inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.5), inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.2), 0 10px 22px rgba(255, 138, 61, 0.45);
 }
 
 .clay-badge-github {
@@ -156,12 +342,10 @@ html {
 }
 
 .clay-badge-mail {
-  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 55%), linear-gradient(135deg, #FE6B01 0%, #F32100 50%, #500700 100%);
-  box-shadow: inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.4), inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.3), 0 6px 14px rgba(243, 33, 0, 0.3);
+  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 55%), linear-gradient(135deg, var(--color-accent-soft) 0%, var(--color-accent) 52%, var(--color-accent-deep) 100%);
+  box-shadow: inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.4), inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.3), 0 6px 14px rgba(255, 107, 53, 0.3);
 }
 
 .clay-badge-mail:hover {
-  box-shadow: inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.5), inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.2), 0 10px 22px rgba(243, 33, 0, 0.45);
+  box-shadow: inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.5), inset -1.5px -1.5px 3px rgba(0, 0, 0, 0.2), 0 10px 22px rgba(255, 138, 61, 0.45);
 }
-
-

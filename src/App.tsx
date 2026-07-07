@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { ArrowLeft, ArrowRight, Zap, Code, Users, ShieldCheck, Globe, Palette, Server, TrendingUp, CheckCircle2, Cpu, Puzzle, Brain, Layers, Search, Map, Code2, Rocket, Menu, X } from "lucide-react";
 import "./App.css";
 import ElectricBorder from "./components/ElectricBorder";
+import ClickSpark from "./components/ClickSpark";
+import GhostCursor from "./components/GhostCursor";
 
 // Interface for founder data
 interface Founder {
@@ -261,7 +263,8 @@ export default function App() {
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 640);
   const [processedImages, setProcessedImages] = useState<string[]>([]);
   const [imagesLoaded, setImagesLoaded] = useState<boolean>(false);
-  
+
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Mouse tracking state for ambient glow effect
@@ -303,6 +306,22 @@ export default function App() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  const [scrolledPastHero, setScrolledPastHero] = useState(false);
+  useEffect(() => {
+    const heroEl = document.getElementById("hero-section-container");
+    if (!heroEl) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setScrolledPastHero(!entry.isIntersecting);
+      },
+      { threshold: 0.01 }
+    );
+    observer.observe(heroEl);
+    return () => observer.disconnect();
+  }, []);
+
+
 
   // Preload and process images on mount
   useEffect(() => {
@@ -464,8 +483,15 @@ export default function App() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#0A0A0A] text-white">
-      <Navbar />
+    <ClickSpark
+      sparkColor="#FFF7ED"
+      sparkSize={10}
+      sparkRadius={30}
+      sparkCount={8}
+      duration={400}
+    >
+      <div className="w-full min-h-screen bg-[#0A0A0A] text-white relative">
+        <Navbar />
       {/* Hero Section Container (Exactly 100vh) */}
       <div
         ref={containerRef}
@@ -773,9 +799,33 @@ export default function App() {
       </div>
 
       {/* Continuous Brand Gradient Container for all sections below Hero */}
-      <div className="w-full relative z-30 brand-gradient-bg">
-        {/* Value Pillars Grid (Transition Block - positioned completely below the hero) */}
-        <div className="w-full py-16 border-t border-white/5 relative z-30">
+      <main data-ghost-area className="w-full relative overflow-hidden z-30 bg-[#010101]">
+        {/* ORIGINAL continuous Phoenix gradient background */}
+        <div className="absolute inset-0 z-0 pointer-events-none phoenix-site-gradient" />
+
+        {/* GhostCursor effect on all sections below hero */}
+        {scrolledPastHero && (
+          <GhostCursor
+            color="#F97316"
+            brightness={isMobile ? 0.8 : 1.4}
+            edgeIntensity={0}
+            trailLength={isMobile ? 20 : 40}
+            inertia={0.5}
+            grainIntensity={0.04}
+            bloomStrength={isMobile ? 0.08 : 0.15}
+            bloomRadius={0.8}
+            bloomThreshold={0.1}
+            fadeDelayMs={isMobile ? 500 : 1000}
+            fadeDurationMs={isMobile ? 1000 : 1500}
+            mixBlendMode="screen"
+            zIndex={35}
+            maxDevicePixelRatio={isMobile ? 0.35 : 0.5}
+          />
+        )}
+
+        <div className="relative z-10">
+          {/* Value Pillars Grid (Transition Block - positioned completely below the hero) */}
+          <div className="w-full py-16 border-t border-white/5 relative z-30">
           <div className="max-w-7xl mx-auto px-6 sm:px-12 md:px-24">
             <div className="bg-[#111111]/80 backdrop-blur-md border border-white/5 rounded-2xl p-6 md:p-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 shadow-[0_24px_48px_rgba(0,0,0,0.5)]">
               <div className="flex flex-col gap-3">
@@ -830,8 +880,10 @@ export default function App() {
 
         {/* Final Cinematic Section & Footer */}
         <FinalSection />
+        </div>
+      </main>
       </div>
-    </div>
+    </ClickSpark>
   );
 }
 
