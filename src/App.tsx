@@ -548,7 +548,7 @@ export default function App() {
               <span className="font-mono text-[10px] uppercase tracking-wider select-none">
                 View Our Work
               </span>
-              <div className="w-6 h-6 rounded-full border border-white/20 flex items-center justify-center bg-white/5 group-hover:bg-white/10 group-hover:border-white/40 transition-colors duration-200">
+              <div className="phoenix-icon-3d w-6 h-6 rounded-full border border-white/20 flex items-center justify-center bg-white/5 group-hover:bg-white/10 group-hover:border-white/40 transition-colors duration-200">
                 <ArrowRight size={10} className="text-white group-hover:translate-x-0.5 transition-transform duration-200" />
               </div>
             </a>
@@ -791,7 +791,7 @@ export default function App() {
             <span className="font-display text-2xl sm:text-3xl tracking-wide uppercase select-none">
               View Our Work
             </span>
-            <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center bg-white/5 group-hover:bg-white/10 group-hover:border-white/40 transition-colors duration-200">
+            <div className="phoenix-icon-3d w-10 h-10 rounded-full border border-white/20 flex items-center justify-center bg-white/5 group-hover:bg-white/10 group-hover:border-white/40 transition-colors duration-200">
               <ArrowRight size={18} className="text-white group-hover:translate-x-0.5 transition-transform duration-200" />
             </div>
           </a>
@@ -829,28 +829,28 @@ export default function App() {
           <div className="max-w-7xl mx-auto px-6 sm:px-12 md:px-24">
             <div className="bg-[#111111]/80 backdrop-blur-md border border-white/5 rounded-2xl p-6 md:p-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 shadow-[0_24px_48px_rgba(0,0,0,0.5)]">
               <div className="flex flex-col gap-3">
-                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-accent">
+                <div className="phoenix-icon-3d w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-accent">
                   <Zap size={16} />
                 </div>
                 <h4 className="text-white font-sans text-xs font-bold tracking-wider uppercase">Fast & Reliable</h4>
                 <p className="text-white/50 text-[11px] leading-relaxed">High performance solutions built for scale.</p>
               </div>
               <div className="flex flex-col gap-3">
-                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-accent">
+                <div className="phoenix-icon-3d w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-accent">
                   <Code size={16} />
                 </div>
                 <h4 className="text-white font-sans text-xs font-bold tracking-wider uppercase">Modern Technology</h4>
                 <p className="text-white/50 text-[11px] leading-relaxed">We use the latest tools to build future-ready products.</p>
               </div>
               <div className="flex flex-col gap-3">
-                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-accent">
+                <div className="phoenix-icon-3d w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-accent">
                   <Users size={16} />
                 </div>
                 <h4 className="text-white font-sans text-xs font-bold tracking-wider uppercase">Collaborative</h4>
                 <p className="text-white/50 text-[11px] leading-relaxed">We work closely with you from idea to launch.</p>
               </div>
               <div className="flex flex-col gap-3">
-                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-accent">
+                <div className="phoenix-icon-3d w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-accent">
                   <ShieldCheck size={16} />
                 </div>
                 <h4 className="text-white font-sans text-xs font-bold tracking-wider uppercase">Quality Focused</h4>
@@ -866,8 +866,17 @@ export default function App() {
         {/* Services Section (Premium Symmetrical Grid) */}
         <ServicesSection />
 
+        {/* Tech Stack Orbit Section */}
+        <TechStackOrbitSection />
+
+        {/* Live Project Preview Switcher */}
+        <LiveProjectPreviewSection />
+
         {/* Featured Work Case Studies Section */}
         <FeaturedWorkSection />
+
+        {/* Before / After Website Transformation Section */}
+        <BeforeAfterSection />
 
         {/* Why Phoenix Labs Section */}
         <WhyPhoenixLabsSection />
@@ -1105,84 +1114,411 @@ function ServicesSection() {
     <section
       ref={sectionRef}
       id="services"
-      className="relative min-h-screen px-6 py-28 sm:py-36 sm:px-12 md:px-24 border-t border-white/5 z-30"
+      className="relative min-h-screen px-6 pt-32 pb-28 sm:pt-36 sm:pb-36 lg:pt-40 lg:px-24 md:px-24 border-t border-white/5 z-30 overflow-hidden"
     >
-      {/* Title block */}
-      <div className={`flex flex-col md:flex-row gap-12 md:gap-24 mb-16 transition-all duration-1000 ease-out transform ${
-        isIntersecting ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
-      }`}>
-        {/* Left Column Label */}
-        <div className="md:w-1/4 flex-shrink-0">
-          <span className="text-white/40 text-xs font-mono tracking-[0.25em] font-semibold uppercase flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse" />
-            02 / Capabilities
-          </span>
+      {/* base background */}
+      <div className="absolute inset-0 z-0 pointer-events-none services-base-bg" />
+
+      {/* new atmospheric meeting room scene */}
+      <div className="absolute inset-0 z-[1] pointer-events-none services-scene-bg" />
+
+      {/* readability overlay */}
+      <div className="absolute inset-0 z-[2] pointer-events-none services-scene-overlay" />
+
+      {/* actual content */}
+      <div className="relative z-20">
+        {/* Title block */}
+        <div className={`flex flex-col md:flex-row gap-12 md:gap-24 mb-16 transition-all duration-1000 ease-out transform ${
+          isIntersecting ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+        }`}>
+          {/* Left Column Label */}
+          <div className="md:w-1/4 flex-shrink-0">
+            <span className="text-white/40 text-xs font-mono tracking-[0.25em] font-semibold uppercase flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse" />
+              02 / Capabilities
+            </span>
+          </div>
+          {/* Right Column Statement */}
+          <div className="md:w-3/4">
+            <h3 className="text-white font-sans text-3xl sm:text-5xl font-bold tracking-tight leading-[1.15] max-w-4xl uppercase">
+              Services that scale with your ambitions.
+            </h3>
+            <p className="text-white/50 text-sm sm:text-base leading-relaxed mt-4 max-w-2xl font-sans">
+              We operate as an elite studio, deploying micro-teams of high-end designers and engineers. No layers of management, just direct access to builders.
+            </p>
+          </div>
         </div>
-        {/* Right Column Statement */}
-        <div className="md:w-3/4">
-          <h3 className="text-white font-sans text-3xl sm:text-5xl font-bold tracking-tight leading-[1.15] max-w-4xl uppercase">
-            Services that scale with your ambitions.
-          </h3>
-          <p className="text-white/50 text-sm sm:text-base leading-relaxed mt-4 max-w-2xl font-sans">
-            We operate as an elite studio, deploying micro-teams of high-end designers and engineers. No layers of management, just direct access to builders.
-          </p>
+
+        {/* Symmetrical Services Grid (2x2 equal width columns on desktop/tablet) */}
+        <div
+          className={`grid grid-cols-1 md:grid-cols-2 gap-6 max-w-7xl mx-auto transition-all duration-1000 delay-300 ease-out transform ${
+            isIntersecting ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
+          }`}
+        >
+          {services.map((svc) => {
+            const glow = glows[svc.id] || { x: "50%", y: "50%" };
+            return (
+              <ElectricBorder
+                key={svc.id}
+                color="#F32100"
+                speed={0.3}
+                chaos={0.08}
+                borderRadius={28}
+                onMouseMove={(e) => handleMouseMove(svc.id, e)}
+                className="bento-card group p-6 sm:p-8 flex flex-col justify-between relative z-10 min-h-[300px] sm:min-h-[320px]"
+                style={{
+                  // @ts-expect-error Custom CSS variables
+                  "--mouse-x": glow.x,
+                  "--mouse-y": glow.y,
+                }}
+              >
+                {svc.graphic}
+
+                {/* Text content & tag pills wrapped inside a single container that is restricted to max 58% width on desktop to guarantee zero overlap */}
+                <div className="relative z-10 flex-1 flex flex-col justify-between h-full w-full md:max-w-[58%]">
+                  <div className="flex flex-col gap-4">
+                    <div className="phoenix-icon-3d w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-accent/30 transition-colors duration-300">
+                      {svc.icon}
+                    </div>
+                    <h4 className="text-white font-sans text-xl sm:text-2xl font-bold tracking-tight mt-2 uppercase">
+                      {svc.title}
+                    </h4>
+                    <p className="text-white/50 text-xs sm:text-sm leading-relaxed">
+                      {svc.description}
+                    </p>
+                  </div>
+
+                  {/* Tag pill display */}
+                  <div className="flex flex-wrap gap-2 mt-6">
+                    {svc.bullets.map((bullet) => (
+                      <span
+                        key={bullet}
+                        className="inline-block px-2.5 py-0.5 border border-white/10 rounded-md text-[9px] sm:text-[10px] tracking-wider uppercase font-mono bg-white/5 text-white/70 group-hover:border-white/20 transition-all duration-300"
+                      >
+                        {bullet}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </ElectricBorder>
+            );
+          })}
         </div>
       </div>
+    </section>
+  );
+}
 
-      {/* Symmetrical Services Grid (2x2 equal width columns on desktop/tablet) */}
-      <div 
-        className={`grid grid-cols-1 md:grid-cols-2 gap-6 max-w-7xl mx-auto transition-all duration-1000 delay-300 ease-out transform ${
-          isIntersecting ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
-        }`}
-      >
-        {services.map((svc) => {
-          const glow = glows[svc.id] || { x: "50%", y: "50%" };
-          return (
-            <ElectricBorder
-              key={svc.id}
-              color="#F32100"
-              speed={0.3}
-              chaos={0.08}
-              borderRadius={28}
-              onMouseMove={(e) => handleMouseMove(svc.id, e)}
-              className="bento-card group p-6 sm:p-8 flex flex-col justify-between relative z-10 min-h-[300px] sm:min-h-[320px]"
-              style={{
-                // @ts-expect-error Custom CSS variables
-                "--mouse-x": glow.x,
-                "--mouse-y": glow.y,
-              }}
-            >
-              {svc.graphic}
+// ==========================================
+// TECH STACK ORBIT SECTION
+// ==========================================
 
-              {/* Text content & tag pills wrapped inside a single container that is restricted to max 58% width on desktop to guarantee zero overlap */}
-              <div className="relative z-10 flex-1 flex flex-col justify-between h-full w-full md:max-w-[58%]">
-                <div className="flex flex-col gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-accent/30 transition-colors duration-300">
-                    {svc.icon}
-                  </div>
-                  <h4 className="text-white font-sans text-xl sm:text-2xl font-bold tracking-tight mt-2 uppercase">
-                    {svc.title}
-                  </h4>
-                  <p className="text-white/50 text-xs sm:text-sm leading-relaxed">
-                    {svc.description}
-                  </p>
-                </div>
+const TECH_STACK_ITEMS = [
+  "React",
+  "Next.js",
+  "Vite",
+  "TypeScript",
+  "Tailwind",
+  "Node.js",
+  "Express",
+  "Supabase",
+  "Firebase",
+  "MongoDB",
+  "PostgreSQL",
+  "Vercel",
+  "AI APIs",
+  "Framer Motion",
+];
 
-                {/* Tag pill display */}
-                <div className="flex flex-wrap gap-2 mt-6">
-                  {svc.bullets.map((bullet) => (
-                    <span
-                      key={bullet}
-                      className="inline-block px-2.5 py-0.5 border border-white/10 rounded-md text-[9px] sm:text-[10px] tracking-wider uppercase font-mono bg-white/5 text-white/70 group-hover:border-white/20 transition-all duration-300"
-                    >
-                      {bullet}
-                    </span>
-                  ))}
-                </div>
+function TechStackOrbitSection() {
+  const innerItems = TECH_STACK_ITEMS.slice(0, 6);
+  const outerItems = TECH_STACK_ITEMS.slice(6);
+
+  return (
+    <section
+      id="tech-stack"
+      className="relative overflow-hidden py-24 sm:py-28 lg:py-36"
+    >
+      <div className="pointer-events-none absolute inset-0 z-0 tech-orbit-bg" />
+
+      <div className="relative z-20 mx-auto max-w-7xl px-6">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-xs sm:text-sm font-black uppercase tracking-[0.35em] text-[#FF6B35]/80">
+            03 / Tech Stack
+          </p>
+
+          <h2 className="mt-5 text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight text-white">
+            STACKS WE BUILD WITH.
+          </h2>
+
+          <p className="mt-6 text-base sm:text-lg leading-8 text-white/65">
+            Modern tools, scalable systems, and production-ready frameworks
+            powering every Phoenix Labs project.
+          </p>
+        </div>
+
+        <div className="tech-orbit-stage mt-16 sm:mt-20">
+          <div className="tech-orbit-core">
+            <div className="tech-orbit-core-inner">
+              <span className="text-4xl sm:text-5xl font-black text-white">
+                PL
+              </span>
+              <span className="mt-2 text-[10px] uppercase tracking-[0.35em] text-[#FF6B35]">
+                Phoenix Core
+              </span>
+            </div>
+          </div>
+
+          <div className="tech-orbit-ring tech-orbit-ring-inner">
+            {innerItems.map((item, index) => (
+              <div
+                key={item}
+                className="tech-orbit-item"
+                style={
+                  {
+                    "--orbit-index": index,
+                    "--orbit-total": innerItems.length,
+                    "--angle": `${(360 / innerItems.length) * index}deg`,
+                    "--angle-negative": `${(-360 / innerItems.length) * index}deg`,
+                  } as React.CSSProperties
+                }
+              >
+                <span>{item}</span>
               </div>
-            </ElectricBorder>
-          );
-        })}
+            ))}
+          </div>
+
+          <div className="tech-orbit-ring tech-orbit-ring-outer">
+            {outerItems.map((item, index) => (
+              <div
+                key={item}
+                className="tech-orbit-item tech-orbit-item-outer"
+                style={
+                  {
+                    "--orbit-index": index,
+                    "--orbit-total": outerItems.length,
+                    "--angle": `${(360 / outerItems.length) * index}deg`,
+                    "--angle-negative": `${(-360 / outerItems.length) * index}deg`,
+                  } as React.CSSProperties
+                }
+              >
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="tech-orbit-mobile-grid mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {TECH_STACK_ITEMS.map((item) => (
+            <div key={item} className="tech-orbit-mobile-pill">
+              {item}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ==========================================
+// LIVE PROJECT PREVIEW SWITCHER
+// ==========================================
+
+const LIVE_PROJECT_PREVIEWS = [
+  {
+    name: "Landing Page",
+    description: "High-converting one-page websites for launches, portfolios, and service brands.",
+    features: ["Hero + CTA", "Services / Work sections", "Contact lead form"],
+    timeline: "3–5 days",
+    type: "landing",
+    url: "preview.local/landing",
+  },
+  {
+    name: "Business Website",
+    description: "Professional multi-page websites for brands, agencies, and local businesses.",
+    features: ["Multiple pages", "SEO-ready structure", "Admin-friendly content"],
+    timeline: "5–10 days",
+    type: "business",
+    url: "preview.local/business",
+  },
+  {
+    name: "SaaS Dashboard",
+    description: "Clean dashboards with analytics, tables, user flows, and scalable UI systems.",
+    features: ["Auth-ready layout", "Analytics cards", "Responsive dashboard"],
+    timeline: "2–4 weeks",
+    type: "saas",
+    url: "preview.local/dashboard",
+  },
+  {
+    name: "AI Tool",
+    description: "AI-powered interfaces for chatbots, automation tools, and smart workflows.",
+    features: ["Prompt interface", "API integration", "Smart result cards"],
+    timeline: "2–5 weeks",
+    type: "ai",
+    url: "preview.local/ai-workflow",
+  },
+] as const;
+
+type LivePreviewName = (typeof LIVE_PROJECT_PREVIEWS)[number]["name"];
+
+function LiveProjectPreviewSection() {
+  const [activePreview, setActivePreview] = useState<LivePreviewName>("Landing Page");
+  const selectedPreview = LIVE_PROJECT_PREVIEWS.find((preview) => preview.name === activePreview) ?? LIVE_PROJECT_PREVIEWS[0];
+
+  const renderMockup = () => {
+    switch (selectedPreview.type) {
+      case "landing":
+        return (
+          <div className="live-mockup landing-mockup">
+            <div className="landing-nav">
+              <span className="mock-brand-mark">PHX</span>
+              <div className="mock-nav-lines"><span /><span /><span /></div>
+              <span className="mock-nav-cta">Start</span>
+            </div>
+            <div className="landing-hero">
+              <div className="landing-copy">
+                <span className="mock-kicker">Launch with impact</span>
+                <div className="mock-heading-lines"><span /><span /></div>
+                <div className="mock-copy-lines"><span /><span /><span /></div>
+                <div className="mock-cta-row"><span>Build yours</span><i /></div>
+              </div>
+              <div className="landing-visual">
+                <div className="landing-orb" />
+                <div className="landing-float-card landing-float-card-top"><b>+42%</b><span>Conversion</span></div>
+                <div className="landing-float-card landing-float-card-bottom"><i /><i /><i /></div>
+              </div>
+            </div>
+            <div className="landing-proof"><span>Strategy</span><span>Design</span><span>Development</span></div>
+          </div>
+        );
+      case "business":
+        return (
+          <div className="live-mockup business-mockup">
+            <div className="business-nav">
+              <span className="business-logo"><i />NORTH & CO.</span>
+              <div className="mock-nav-lines"><span /><span /><span /><span /></div>
+              <span className="business-contact">Contact</span>
+            </div>
+            <div className="business-hero">
+              <div className="business-copy">
+                <span className="mock-kicker">Built for ambitious brands</span>
+                <div className="business-title"><span /><span /><span /></div>
+                <div className="mock-copy-lines"><span /><span /></div>
+                <div className="business-actions"><b>Explore services</b><span>Our story →</span></div>
+              </div>
+              <div className="business-mosaic">
+                <div className="business-mosaic-main"><i /></div>
+                <div className="business-mosaic-side"><span /><span /></div>
+              </div>
+            </div>
+            <div className="business-services"><span>Brand systems</span><span>Digital products</span><span>Growth strategy</span></div>
+          </div>
+        );
+      case "saas":
+        return (
+          <div className="live-mockup saas-mockup">
+            <aside className="saas-sidebar">
+              <span className="saas-logo">P</span>
+              <div className="saas-side-icons"><i className="active" /><i /><i /><i /><i /></div>
+              <span className="saas-avatar" />
+            </aside>
+            <div className="saas-main">
+              <div className="saas-topbar"><div><b>Overview</b><span>Good morning, Alex</span></div><span className="saas-top-action">New report</span></div>
+              <div className="saas-metrics">
+                <div><span>Revenue</span><b>₹8.4L</b><i>+18.2%</i></div>
+                <div><span>Active users</span><b>12,842</b><i>+9.6%</i></div>
+                <div><span>Conversion</span><b>6.24%</b><i>+2.1%</i></div>
+              </div>
+              <div className="saas-grid">
+                <div className="saas-chart"><div className="saas-widget-title"><b>Performance</b><span>Last 30 days</span></div><div className="saas-bars"><i /><i /><i /><i /><i /><i /><i /><i /></div></div>
+                <div className="saas-activity"><div className="saas-widget-title"><b>Activity</b><span>Live</span></div><ul><li><i />New workspace</li><li><i />Plan upgraded</li><li><i />Report shared</li><li><i />Invite accepted</li></ul></div>
+              </div>
+            </div>
+          </div>
+        );
+      case "ai":
+        return (
+          <div className="live-mockup ai-mockup">
+            <aside className="ai-sidebar">
+              <span className="ai-logo"><i />PHX AI</span>
+              <span className="ai-new-workflow">+ New workflow</span>
+              <div className="ai-history"><span className="active">Launch campaign</span><span>Research summary</span><span>Product insights</span><span>Content system</span></div>
+              <span className="ai-user"><i />Workspace Pro</span>
+            </aside>
+            <div className="ai-workspace">
+              <div className="ai-topbar"><div><b>Launch campaign</b><span>Smart workflow</span></div><span>Share</span></div>
+              <div className="ai-chat">
+                <div className="ai-message ai-message-user">Build a launch plan for a premium SaaS product.</div>
+                <div className="ai-message ai-message-system"><span className="ai-spark">✦</span><div><b>Launch system generated</b><p>I mapped the positioning, channel plan, and a four-week execution sequence.</p><div className="ai-result-cards"><span><i />Positioning</span><span><i />Channel mix</span><span><i />4-week plan</span></div></div></div>
+              </div>
+              <div className="ai-composer"><span>Ask Phoenix AI anything…</span><i>↑</i></div>
+            </div>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <section id="live-preview" className="relative z-30 border-t border-white/5 px-6 py-24 sm:px-12 sm:py-28 md:px-24 lg:py-36">
+      <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-4xl text-center">
+          <p className="text-xs font-black uppercase tracking-[0.35em] text-accent/80">Interactive Build Lab</p>
+          <h2 className="mt-5 text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-7xl">PICK A BUILD. SEE THE SYSTEM.</h2>
+          <p className="mx-auto mt-6 max-w-2xl text-sm leading-7 text-white/55 sm:text-base">
+            From landing pages to AI tools, Phoenix Labs designs interfaces that look sharp and work like real products.
+          </p>
+        </div>
+
+        <div className="live-preview-tabs mt-10" aria-label="Project preview options">
+          {LIVE_PROJECT_PREVIEWS.map((preview) => {
+            const isActive = preview.name === activePreview;
+            return (
+              <button
+                key={preview.name}
+                type="button"
+                aria-pressed={isActive}
+                onClick={() => setActivePreview(preview.name)}
+                className={isActive ? "is-active" : ""}
+              >
+                <span>{preview.name}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="live-preview-shell mt-6">
+          <div key={`${selectedPreview.name}-details`} className="live-preview-details live-preview-enter" aria-live="polite">
+            <div>
+              <span className="live-preview-label">Selected build</span>
+              <h3>{selectedPreview.name}</h3>
+              <p>{selectedPreview.description}</p>
+            </div>
+
+            <ul className="live-preview-features">
+              {selectedPreview.features.map((feature) => (
+                <li key={feature}><span aria-hidden="true" />{feature}</li>
+              ))}
+            </ul>
+
+            <div className="live-preview-timeline">
+              <span>Estimated timeline</span>
+              <strong>{selectedPreview.timeline}</strong>
+            </div>
+          </div>
+
+          <div className="live-preview-browser-wrap">
+            <div className="live-preview-browser">
+              <div className="live-preview-browser-bar">
+                <div className="live-browser-dots"><span /><span /><span /></div>
+                <span className="live-browser-url">{selectedPreview.url}</span>
+                <span className="live-browser-status"><i />Live preview</span>
+              </div>
+              <div key={selectedPreview.name} className="live-preview-canvas live-preview-enter" aria-hidden="true">
+                {renderMockup()}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -1481,6 +1817,77 @@ const PROJECTS = [
   }
 ];
 
+function TiltCard({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const frameRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    };
+  }, []);
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!el) return;
+
+    const isTouch = window.matchMedia?.("(max-width: 768px)")?.matches;
+    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+
+    if (isTouch || reducedMotion) return;
+
+    if (frameRef.current) cancelAnimationFrame(frameRef.current);
+
+    frameRef.current = requestAnimationFrame(() => {
+      const rect = el.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      const midX = rect.width / 2;
+      const midY = rect.height / 2;
+
+      const rotateY = ((x - midX) / midX) * 5;
+      const rotateX = -((y - midY) / midY) * 5;
+
+      el.style.setProperty("--tilt-x", `${rotateX}deg`);
+      el.style.setProperty("--tilt-y", `${rotateY}deg`);
+      el.style.setProperty("--tilt-glow-x", `${(x / rect.width) * 100}%`);
+      el.style.setProperty("--tilt-glow-y", `${(y / rect.height) * 100}%`);
+    });
+  };
+
+  const handlePointerLeave = () => {
+    const el = ref.current;
+    if (!el) return;
+
+    if (frameRef.current) cancelAnimationFrame(frameRef.current);
+
+    el.style.setProperty("--tilt-x", "0deg");
+    el.style.setProperty("--tilt-y", "0deg");
+    el.style.setProperty("--tilt-glow-x", "50%");
+    el.style.setProperty("--tilt-glow-y", "50%");
+  };
+
+  return (
+    <div className={`tilt-card-wrap ${className}`}>
+      <div
+        ref={ref}
+        className="tilt-card-surface"
+        onPointerMove={handlePointerMove}
+        onPointerLeave={handlePointerLeave}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
 // Featured Work Section Component
 function FeaturedWorkSection() {
   const [visibleProjects, setVisibleProjects] = useState<Record<string, boolean>>({});
@@ -1549,9 +1956,13 @@ function FeaturedWorkSection() {
   return (
     <section
       id="work"
-      className="relative min-h-screen px-6 py-28 sm:py-36 sm:px-12 md:px-24 border-t border-white/5 z-30"
+      className="relative min-h-screen px-6 py-28 sm:py-36 sm:px-12 md:px-24 border-t border-white/5 z-30 overflow-hidden"
     >
-      {/* Title block */}
+      <div className="absolute inset-0 z-0 pointer-events-none work-scene-bg" />
+      <div className="absolute inset-0 z-[1] pointer-events-none work-scene-overlay" />
+
+      <div className="relative z-20">
+        {/* Title block */}
       <div className="flex flex-col md:flex-row gap-12 md:gap-24 mb-24">
         <div className="md:w-1/4 flex-shrink-0">
           <span className="text-white/40 text-xs font-mono tracking-[0.25em] font-semibold uppercase flex items-center gap-2">
@@ -1588,19 +1999,21 @@ function FeaturedWorkSection() {
             >
               {/* Visual Preview Container wrapped with ElectricBorder */}
               <div className="w-full lg:w-1/2 aspect-[16/10]">
-                <ElectricBorder
-                  color="#F32100"
-                  speed={0.3}
-                  chaos={0.08}
-                  borderRadius={16}
-                  className="w-full h-full"
-                >
-                  <div className="w-full h-full bg-[#111111] border border-white/5 rounded-2xl p-4 flex items-center justify-center relative overflow-hidden group shadow-[0_16px_36px_rgba(0,0,0,0.4)] hover:-translate-y-1.5 hover:border-accent/25 hover:shadow-[0_20px_48px_rgba(243, 33, 0,0.06)] transition-all duration-500">
-                    <div className="w-full h-full transform group-hover:scale-[1.02] transition-transform duration-700 ease-out">
-                      {proj.mockup}
+                <TiltCard className="w-full h-full rounded-2xl">
+                  <ElectricBorder
+                    color="#F32100"
+                    speed={0.3}
+                    chaos={0.08}
+                    borderRadius={16}
+                    className="w-full h-full"
+                  >
+                    <div className="w-full h-full bg-[#111111] border border-white/5 rounded-2xl p-4 flex items-center justify-center relative overflow-hidden group shadow-[0_16px_36px_rgba(0,0,0,0.4)] hover:-translate-y-1.5 hover:border-accent/25 hover:shadow-[0_20px_48px_rgba(243, 33, 0,0.06)] transition-all duration-500">
+                      <div className="w-full h-full transform group-hover:scale-[1.02] transition-transform duration-700 ease-out">
+                        {proj.mockup}
+                      </div>
                     </div>
-                  </div>
-                </ElectricBorder>
+                  </ElectricBorder>
+                </TiltCard>
               </div>
 
               {/* Content Area */}
@@ -1659,10 +2072,11 @@ function FeaturedWorkSection() {
               </div>
             </div>
           );
-        })}
-      </div>
+      })}
+    </div>
+    </div>
 
-      {/* ========== GALLERY LIGHTBOX MODAL ========== */}
+    {/* ========== GALLERY LIGHTBOX MODAL ========== */}
       {galleryOpen && (
         <div
           className="fixed inset-0 z-[9999] flex items-center justify-center"
@@ -1777,6 +2191,143 @@ function FeaturedWorkSection() {
   );
 }
 
+function BeforeAfterSection() {
+  const [slider, setSlider] = useState(50);
+  const shellRef = useRef<HTMLDivElement | null>(null);
+  const draggingRef = useRef(false);
+
+  const updateSlider = (event: React.PointerEvent<HTMLDivElement>) => {
+    const shell = shellRef.current;
+    if (!shell) return;
+
+    const rect = shell.getBoundingClientRect();
+    const next = ((event.clientX - rect.left) / rect.width) * 100;
+    setSlider(Math.min(100, Math.max(0, next)));
+  };
+
+  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    draggingRef.current = true;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    updateSlider(event);
+  };
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!draggingRef.current) return;
+    updateSlider(event);
+  };
+
+  const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    draggingRef.current = false;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      setSlider((current) => Math.max(0, current - 5));
+    }
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      setSlider((current) => Math.min(100, current + 5));
+    }
+  };
+
+  return (
+    <section id="before-after" className="relative overflow-hidden py-24 sm:py-28 lg:py-36">
+      <div className="relative z-20 mx-auto max-w-7xl px-6">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-xs sm:text-sm font-black uppercase tracking-[0.35em] text-[#FF6B35]/80">
+            Transformation
+          </p>
+
+          <h2 className="mt-5 text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight text-white">
+            FROM BASIC TO BUILT RIGHT.
+          </h2>
+
+          <p className="mt-6 text-base sm:text-lg leading-8 text-white/65">
+            Drag the slider to see how Phoenix Labs turns flat digital presence into polished, conversion-ready web experiences.
+          </p>
+        </div>
+
+        <div
+          ref={shellRef}
+          className="before-after-shell mt-14 sm:mt-20"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          onKeyDown={handleKeyDown}
+          role="slider"
+          tabIndex={0}
+          aria-label="Before and after website transformation comparison"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(slider)}
+        >
+          <div className="before-panel">
+            <div className="mock-browser mock-before">
+              <div className="mock-browser-top">
+                <span />
+                <span />
+                <span />
+              </div>
+              <div className="mock-label mock-label-before">Before</div>
+              <div className="mock-before-hero">
+                <div className="mock-before-title" />
+                <div className="mock-before-line" />
+                <div className="mock-before-line short" />
+                <div className="mock-before-cta">Click Here</div>
+              </div>
+              <div className="mock-before-grid">
+                <span />
+                <span />
+                <span />
+              </div>
+            </div>
+          </div>
+
+          <div
+            className="after-panel"
+            style={{ clipPath: `inset(0 ${100 - slider}% 0 0)` }}
+          >
+            <div className="mock-browser mock-after">
+              <div className="mock-browser-top">
+                <span />
+                <span />
+                <span />
+              </div>
+              <div className="mock-label mock-label-after">After</div>
+              <div className="mock-after-hero">
+                <div>
+                  <div className="mock-after-kicker">Phoenix Labs</div>
+                  <div className="mock-after-title" />
+                  <div className="mock-after-line" />
+                </div>
+                <div className="mock-after-cta">Start Project</div>
+              </div>
+              <div className="mock-after-grid">
+                <span />
+                <span />
+                <span />
+              </div>
+            </div>
+          </div>
+
+          <div
+            className="comparison-handle"
+            style={{ left: `${slider}%` }}
+            aria-hidden="true"
+          >
+            <span />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ==========================================
 // WHY PHOENIX LABS SECTION
 // ==========================================
@@ -1851,8 +2402,12 @@ function WhyPhoenixLabsSection() {
     <section
       ref={sectionRef}
       id="why-us"
-      className="relative min-h-screen px-6 py-28 sm:py-36 sm:px-12 md:px-24 border-t border-white/5 z-30 flex flex-col justify-between"
+      className="relative min-h-screen px-6 py-28 sm:py-36 sm:px-12 md:px-24 border-t border-white/5 z-30 flex flex-col justify-between overflow-hidden"
     >
+      <div className="absolute inset-0 z-0 pointer-events-none why-scene-bg" />
+      <div className="absolute inset-0 z-[1] pointer-events-none why-scene-overlay" />
+
+      <div className="relative z-20 w-full flex-1 flex flex-col justify-between">
       {/* Header */}
       <div className={`flex flex-col md:flex-row gap-12 md:gap-24 mb-20 transition-all duration-1000 ease-out transform ${
         isIntersecting ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
@@ -1897,7 +2452,7 @@ function WhyPhoenixLabsSection() {
               }}
             >
               {/* Icon Container */}
-              <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-accent/30 transition-colors duration-300">
+              <div className="phoenix-icon-3d w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-accent/30 transition-colors duration-300">
                 {feat.icon}
               </div>
 
@@ -1924,6 +2479,7 @@ function WhyPhoenixLabsSection() {
         <p className="text-2xl sm:text-4xl md:text-5xl font-display uppercase tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-accent/80 select-none">
           "We build products we'd be proud to use ourselves."
         </p>
+      </div>
       </div>
     </section>
   );
@@ -2429,7 +2985,7 @@ function OurProcessSection() {
                 >
                   {/* Card Header (Icon & Step title) */}
                   <div className="flex items-center gap-3.5">
-                    <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-accent group-hover:border-accent/30 transition-colors duration-300">
+                    <div className="phoenix-icon-3d w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-accent group-hover:border-accent/30 transition-colors duration-300">
                       {step.icon}
                     </div>
                     <div className="flex flex-col">
@@ -2479,7 +3035,8 @@ function OurProcessSection() {
         </p>
         <a 
           href="#contact" 
-          className="group inline-flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-accent to-accent-bright hover:brightness-110 text-white text-xs font-sans font-bold uppercase rounded-md tracking-widest transition-all duration-200 active:scale-95 shadow-[0_4px_20px_rgba(243, 33, 0,0.2)]"
+          aria-label="Start a project"
+          className="phoenix-icon-3d group inline-flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-accent to-accent-bright hover:brightness-110 text-white text-xs font-sans font-bold uppercase rounded-md tracking-widest transition-all duration-200 active:scale-95 shadow-[0_4px_20px_rgba(243, 33, 0,0.2)]"
         >
           <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform duration-200" />
         </a>
@@ -2760,7 +3317,7 @@ function ProjectEstimatorSection() {
                     <div className={`absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-accent to-transparent transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-0"}`} />
                     
                     <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all duration-300 ${
+                      <div className={`phoenix-icon-3d w-8 h-8 rounded-lg border flex items-center justify-center transition-all duration-300 ${
                         isActive ? "bg-accent/15 border-accent/40 text-accent" : "bg-white/5 border-white/10 text-white/50"
                       }`}>
                         {type.icon}
@@ -2869,7 +3426,7 @@ function ProjectEstimatorSection() {
                     <div className={`absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent to-transparent transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-0"}`} />
 
                     <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all duration-300 ${
+                      <div className={`phoenix-icon-3d w-8 h-8 rounded-lg border flex items-center justify-center transition-all duration-300 ${
                         isActive ? "bg-accent/15 border-accent/40 text-accent" : "bg-white/5 border-white/10 text-white/50"
                       }`}>
                         {feat.icon}
@@ -3207,7 +3764,7 @@ function FinalSection() {
             <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-accent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
             {/* Icon container - Claymorphism 3D squircle */}
-            <div className="w-16 h-16 flex items-center justify-center text-white rounded-[19px] bg-gradient-to-br from-[#2c2c2c] to-[#111111] shadow-[inset_1.5px_1.5px_3px_rgba(255,255,255,0.35),inset_-1.5px_-1.5px_3px_rgba(0,0,0,0.45),0_8px_18px_rgba(0,0,0,0.55)] relative overflow-hidden transition-all duration-[400ms] group-hover:scale-108 group-hover:-translate-y-1 after:absolute after:inset-0 after:bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.25)_0%,rgba(255,255,255,0)_55%)]">
+            <div className="phoenix-icon-3d social-icon-3d w-16 h-16 flex items-center justify-center text-white rounded-[19px] bg-gradient-to-br from-[#2c2c2c] to-[#111111] shadow-[inset_1.5px_1.5px_3px_rgba(255,255,255,0.35),inset_-1.5px_-1.5px_3px_rgba(0,0,0,0.45),0_8px_18px_rgba(0,0,0,0.55)] relative overflow-hidden transition-all duration-[400ms] group-hover:scale-108 group-hover:-translate-y-1 after:absolute after:inset-0 after:bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.25)_0%,rgba(255,255,255,0)_55%)]">
               <GithubIcon size={28} />
             </div>
             
@@ -3232,7 +3789,7 @@ function FinalSection() {
             <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-accent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
             {/* Icon container - Claymorphism 3D squircle */}
-            <div className="w-16 h-16 flex items-center justify-center text-white rounded-[19px] bg-gradient-to-br from-[#F58529] via-[#DD2A7B] to-[#8134AF] shadow-[inset_1.5px_1.5px_3px_rgba(255,255,255,0.45),inset_-1.5px_-1.5px_3px_rgba(0,0,0,0.3),0_8px_18px_rgba(221,42,123,0.35)] relative overflow-hidden transition-all duration-[400ms] group-hover:scale-108 group-hover:-translate-y-1 after:absolute after:inset-0 after:bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.45)_0%,rgba(255,255,255,0)_55%)]">
+            <div className="phoenix-icon-3d social-icon-3d w-16 h-16 flex items-center justify-center text-white rounded-[19px] bg-gradient-to-br from-[#F58529] via-[#DD2A7B] to-[#8134AF] shadow-[inset_1.5px_1.5px_3px_rgba(255,255,255,0.45),inset_-1.5px_-1.5px_3px_rgba(0,0,0,0.3),0_8px_18px_rgba(221,42,123,0.35)] relative overflow-hidden transition-all duration-[400ms] group-hover:scale-108 group-hover:-translate-y-1 after:absolute after:inset-0 after:bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.45)_0%,rgba(255,255,255,0)_55%)]">
               <InstagramIcon size={28} />
             </div>
             
@@ -3255,7 +3812,7 @@ function FinalSection() {
             <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-accent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
             {/* Icon container - Claymorphism 3D squircle */}
-            <div className="w-16 h-16 flex items-center justify-center text-white rounded-[19px] bg-gradient-to-br from-[#FE6B01] via-[#F32100] to-[#500700] shadow-[inset_1.5px_1.5px_3px_rgba(255,255,255,0.45),inset_-1.5px_-1.5px_3px_rgba(0,0,0,0.3),0_8px_18px_rgba(243,33,0,0.35)] relative overflow-hidden transition-all duration-[400ms] group-hover:scale-108 group-hover:-translate-y-1 after:absolute after:inset-0 after:bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.45)_0%,rgba(255,255,255,0)_55%)]">
+            <div className="phoenix-icon-3d social-icon-3d w-16 h-16 flex items-center justify-center text-white rounded-[19px] bg-gradient-to-br from-[#FE6B01] via-[#F32100] to-[#500700] shadow-[inset_1.5px_1.5px_3px_rgba(255,255,255,0.45),inset_-1.5px_-1.5px_3px_rgba(0,0,0,0.3),0_8px_18px_rgba(243,33,0,0.35)] relative overflow-hidden transition-all duration-[400ms] group-hover:scale-108 group-hover:-translate-y-1 after:absolute after:inset-0 after:bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.45)_0%,rgba(255,255,255,0)_55%)]">
               <MailIcon size={28} />
             </div>
             
@@ -3292,7 +3849,7 @@ function FinalSection() {
             href="https://github.com/Bismeet"
             target="_blank"
             rel="noopener noreferrer"
-            className="clay-badge clay-badge-github"
+            className="phoenix-icon-3d clay-badge clay-badge-github"
             title="GitHub"
           >
             <GithubIcon size={18} />
@@ -3301,14 +3858,14 @@ function FinalSection() {
             href="https://www.instagram.com/phoenixlabs.in?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
             target="_blank"
             rel="noopener noreferrer"
-            className="clay-badge clay-badge-instagram"
+            className="phoenix-icon-3d clay-badge clay-badge-instagram"
             title="Instagram"
           >
             <InstagramIcon size={18} />
           </a>
           <a
             href="mailto:labsphoenix1@gmail.com"
-            className="clay-badge clay-badge-mail"
+            className="phoenix-icon-3d clay-badge clay-badge-mail"
             title="Email"
           >
             <MailIcon size={18} />
