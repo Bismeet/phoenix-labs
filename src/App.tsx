@@ -4,6 +4,8 @@ import "./App.css";
 import ElectricBorder from "./components/ElectricBorder";
 import ClickSpark from "./components/ClickSpark";
 import GhostCursor from "./components/GhostCursor";
+import WhatWeBuildSection from "./components/WhatWeBuildSection";
+import TechStackOrbitSection from "./components/TechStackSolarSystem";
 
 // Interface for founder data
 interface Founder {
@@ -140,12 +142,15 @@ function Navbar() {
       return { observer, el };
     });
 
+    let wasNearTop = window.scrollY < 180;
     const handleScroll = () => {
-      if (window.scrollY < 180) {
+      const isNearTop = window.scrollY < 180;
+      if (isNearTop && !wasNearTop) {
         setActiveSection("home");
       }
+      wasNearTop = isNearTop;
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
       if (heroEl) heroObserver.unobserve(heroEl);
@@ -799,7 +804,7 @@ export default function App() {
       </div>
 
       {/* Continuous Brand Gradient Container for all sections below Hero */}
-      <main data-ghost-area className="w-full relative overflow-hidden z-30 bg-[#010101]">
+      <main data-ghost-area className="w-full relative overflow-x-clip z-30 bg-[#010101]">
         {/* ORIGINAL continuous Phoenix gradient background */}
         <div className="absolute inset-0 z-0 pointer-events-none phoenix-site-gradient" />
 
@@ -809,14 +814,14 @@ export default function App() {
             color="#F97316"
             brightness={isMobile ? 0.8 : 1.4}
             edgeIntensity={0}
-            trailLength={isMobile ? 20 : 40}
+            trailLength={isMobile ? 14 : 24}
             inertia={0.5}
             grainIntensity={0.04}
             bloomStrength={isMobile ? 0.08 : 0.15}
             bloomRadius={0.8}
             bloomThreshold={0.1}
-            fadeDelayMs={isMobile ? 500 : 1000}
-            fadeDurationMs={isMobile ? 1000 : 1500}
+            fadeDelayMs={isMobile ? 180 : 280}
+            fadeDurationMs={isMobile ? 420 : 650}
             mixBlendMode="screen"
             zIndex={35}
             maxDevicePixelRatio={isMobile ? 0.35 : 0.5}
@@ -860,8 +865,8 @@ export default function App() {
           </div>
         </div>
 
-        {/* About/Transition Section */}
-        <AboutSection />
+        {/* Scroll-driven What We Build story */}
+        <WhatWeBuildSection />
 
         {/* Services Section (Premium Symmetrical Grid) */}
         <ServicesSection />
@@ -896,112 +901,8 @@ export default function App() {
   );
 }
 
-// Who We Are / About Section Component
-function AboutSection() {
-  const [isIntersecting, setIsIntersecting] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsIntersecting(true);
-        }
-      },
-      {
-        threshold: 0.20, // Start animation when 20% of section enters viewport
-      }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
-    };
-  }, []);
-
-  const statementLines = [
-    "Phoenix Labs builds modern websites,",
-    "web applications, and SaaS products",
-    "for startups, creators, and businesses.",
-  ];
-
-  return (
-    <section
-      ref={sectionRef}
-      id="about"
-      className="relative min-h-[75vh] px-6 py-20 sm:py-28 sm:px-12 md:px-24 flex flex-col md:flex-row gap-12 md:gap-24 border-t border-white/5 z-30"
-    >
-      {/* Left Column - Sticky Section Label */}
-      <div className="md:w-1/4 flex-shrink-0">
-        <div className="md:sticky md:top-12">
-          <span className="text-white/40 text-xs font-mono tracking-[0.25em] font-semibold uppercase flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse" />
-            01 / Who We Are
-          </span>
-        </div>
-      </div>
-
-      {/* Right Column - Main Text Content */}
-      <div className="md:w-3/4 flex flex-col gap-8">
-        <h3 className="text-white font-sans text-3xl sm:text-5xl font-bold tracking-tight leading-[1.15] max-w-4xl">
-          {statementLines.map((line, idx) => (
-            <span key={idx} className="block overflow-hidden py-1">
-              <span
-                className={`block transition-all duration-750 ease-out transform ${
-                  isIntersecting
-                    ? "translate-y-0 opacity-100"
-                    : "translate-y-12 opacity-0"
-                }`}
-                style={{ transitionDelay: `${idx * 180}ms` }}
-              >
-                {line}
-              </span>
-            </span>
-          ))}
-        </h3>
-
-        {/* Supporting Paragraph & Metrics */}
-        <div
-          className={`flex flex-col gap-10 max-w-2xl transition-all duration-1000 ease-out transform ${
-            isIntersecting
-              ? "translate-y-0 opacity-100"
-              : "translate-y-8 opacity-0"
-          }`}
-          style={{ transitionDelay: "700ms" }}
-        >
-          <p className="text-white/60 text-base sm:text-lg leading-relaxed font-sans font-normal">
-            We partner with ambitious founders and forward-thinking companies to craft products that define industries. By combining high-end motion design, rigorous engineering, and scalable cloud architectures, we turn bold concepts into market-defining digital products.
-          </p>
-
-          {/* Stat Pillars */}
-          <div className="grid grid-cols-2 gap-8 border-t border-white/10 pt-10 mt-2">
-            <div>
-              <h4 className="text-white font-display text-4xl sm:text-5xl leading-none">99+</h4>
-              <p className="text-white/40 text-[10px] font-mono tracking-wider mt-3 uppercase">
-                Lighthouse Performance
-              </p>
-            </div>
-            <div>
-              <h4 className="text-white font-display text-4xl sm:text-5xl leading-none">&lt;100ms</h4>
-              <p className="text-white/40 text-[10px] font-mono tracking-wider mt-3 uppercase">
-                Global Edge Latency
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 // Services Section Component (Premium Symmetrical 2x2 Grid)
 function ServicesSection() {
-  const [glows, setGlows] = useState<Record<string, { x: string; y: string }>>({});
   const [isIntersecting, setIsIntersecting] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -1020,11 +921,10 @@ function ServicesSection() {
     };
   }, []);
 
-  const handleMouseMove = (id: string, e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = `${e.clientX - rect.left}px`;
-    const y = `${e.clientY - rect.top}px`;
-    setGlows((prev) => ({ ...prev, [id]: { x, y } }));
+    e.currentTarget.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
+    e.currentTarget.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
   };
 
   const services = [
@@ -1156,7 +1056,6 @@ function ServicesSection() {
           }`}
         >
           {services.map((svc) => {
-            const glow = glows[svc.id] || { x: "50%", y: "50%" };
             return (
               <ElectricBorder
                 key={svc.id}
@@ -1164,13 +1063,8 @@ function ServicesSection() {
                 speed={0.3}
                 chaos={0.08}
                 borderRadius={28}
-                onMouseMove={(e) => handleMouseMove(svc.id, e)}
+                onMouseMove={handleMouseMove}
                 className="bento-card group p-6 sm:p-8 flex flex-col justify-between relative z-10 min-h-[300px] sm:min-h-[320px]"
-                style={{
-                  // @ts-expect-error Custom CSS variables
-                  "--mouse-x": glow.x,
-                  "--mouse-y": glow.y,
-                }}
               >
                 {svc.graphic}
 
@@ -1203,117 +1097,6 @@ function ServicesSection() {
               </ElectricBorder>
             );
           })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ==========================================
-// TECH STACK ORBIT SECTION
-// ==========================================
-
-const TECH_STACK_ITEMS = [
-  "React",
-  "Next.js",
-  "Vite",
-  "TypeScript",
-  "Tailwind",
-  "Node.js",
-  "Express",
-  "Supabase",
-  "Firebase",
-  "MongoDB",
-  "PostgreSQL",
-  "Vercel",
-  "AI APIs",
-  "Framer Motion",
-];
-
-function TechStackOrbitSection() {
-  const innerItems = TECH_STACK_ITEMS.slice(0, 6);
-  const outerItems = TECH_STACK_ITEMS.slice(6);
-
-  return (
-    <section
-      id="tech-stack"
-      className="relative overflow-hidden py-24 sm:py-28 lg:py-36"
-    >
-      <div className="pointer-events-none absolute inset-0 z-0 tech-orbit-bg" />
-
-      <div className="relative z-20 mx-auto max-w-7xl px-6">
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="text-xs sm:text-sm font-black uppercase tracking-[0.35em] text-[#FF6B35]/80">
-            03 / Tech Stack
-          </p>
-
-          <h2 className="mt-5 text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight text-white">
-            STACKS WE BUILD WITH.
-          </h2>
-
-          <p className="mt-6 text-base sm:text-lg leading-8 text-white/65">
-            Modern tools, scalable systems, and production-ready frameworks
-            powering every Phoenix Labs project.
-          </p>
-        </div>
-
-        <div className="tech-orbit-stage mt-16 sm:mt-20">
-          <div className="tech-orbit-core">
-            <div className="tech-orbit-core-inner">
-              <span className="text-4xl sm:text-5xl font-black text-white">
-                PL
-              </span>
-              <span className="mt-2 text-[10px] uppercase tracking-[0.35em] text-[#FF6B35]">
-                Phoenix Core
-              </span>
-            </div>
-          </div>
-
-          <div className="tech-orbit-ring tech-orbit-ring-inner">
-            {innerItems.map((item, index) => (
-              <div
-                key={item}
-                className="tech-orbit-item"
-                style={
-                  {
-                    "--orbit-index": index,
-                    "--orbit-total": innerItems.length,
-                    "--angle": `${(360 / innerItems.length) * index}deg`,
-                    "--angle-negative": `${(-360 / innerItems.length) * index}deg`,
-                  } as React.CSSProperties
-                }
-              >
-                <span>{item}</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="tech-orbit-ring tech-orbit-ring-outer">
-            {outerItems.map((item, index) => (
-              <div
-                key={item}
-                className="tech-orbit-item tech-orbit-item-outer"
-                style={
-                  {
-                    "--orbit-index": index,
-                    "--orbit-total": outerItems.length,
-                    "--angle": `${(360 / outerItems.length) * index}deg`,
-                    "--angle-negative": `${(-360 / outerItems.length) * index}deg`,
-                  } as React.CSSProperties
-                }
-              >
-                <span>{item}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="tech-orbit-mobile-grid mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {TECH_STACK_ITEMS.map((item) => (
-            <div key={item} className="tech-orbit-mobile-pill">
-              {item}
-            </div>
-          ))}
         </div>
       </div>
     </section>
@@ -1904,16 +1687,23 @@ function FeaturedWorkSection() {
     setGalleryTitle(title);
     setGalleryIndex(0);
     setGalleryOpen(true);
-    document.body.style.overflow = "hidden";
   };
 
   const closeGallery = () => {
     setGalleryOpen(false);
-    document.body.style.overflow = "";
   };
 
   const galleryPrev = () => setGalleryIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
   const galleryNext = () => setGalleryIndex((prev) => (prev + 1) % galleryImages.length);
+
+  useEffect(() => {
+    if (!galleryOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [galleryOpen]);
 
   // Keyboard navigation for gallery
   useEffect(() => {
@@ -2372,7 +2162,6 @@ const FEATURES = [
 ];
 
 function WhyPhoenixLabsSection() {
-  const [glows, setGlows] = useState<Record<string, { x: string; y: string }>>({});
   const [isIntersecting, setIsIntersecting] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -2391,11 +2180,10 @@ function WhyPhoenixLabsSection() {
     };
   }, []);
 
-  const handleMouseMove = (id: string, e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = `${e.clientX - rect.left}px`;
-    const y = `${e.clientY - rect.top}px`;
-    setGlows((prev) => ({ ...prev, [id]: { x, y } }));
+    e.currentTarget.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
+    e.currentTarget.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
   };
 
   return (
@@ -2435,7 +2223,6 @@ function WhyPhoenixLabsSection() {
         }`}
       >
         {FEATURES.map((feat) => {
-          const glow = glows[feat.id] || { x: "50%", y: "50%" };
           return (
             <ElectricBorder
               key={feat.id}
@@ -2443,13 +2230,8 @@ function WhyPhoenixLabsSection() {
               speed={0.3}
               chaos={0.08}
               borderRadius={28}
-              onMouseMove={(e) => handleMouseMove(feat.id, e)}
+              onMouseMove={handleMouseMove}
               className="bento-card group p-6 sm:p-8 flex flex-col justify-start gap-5 relative z-10 min-h-[220px]"
-              style={{
-                // @ts-expect-error Custom CSS variables
-                "--mouse-x": glow.x,
-                "--mouse-y": glow.y,
-              }}
             >
               {/* Icon Container */}
               <div className="phoenix-icon-3d w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-accent/30 transition-colors duration-300">
@@ -2523,7 +2305,6 @@ const STEPS = [
 ];
 
 function OurProcessSection() {
-  const [glows, setGlows] = useState<Record<number, { x: string; y: string }>>({});
   const [yPositions, setYPositions] = useState<number[]>([]);
   const [pathD, setPathD] = useState("");
   const [centerX, setCenterX] = useState(0);
@@ -2537,6 +2318,7 @@ function OurProcessSection() {
   const bgPhoenixRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const stepRefs = useRef<Record<number, HTMLDivElement | null>>({});
+  const activeStepRef = useRef(-1);
 
   const updateTimelineLayout = () => {
     const container = containerRef.current;
@@ -2608,7 +2390,11 @@ function OurProcessSection() {
   useEffect(() => {
     if (yPositions.length === 0 || !pathD) return;
 
-    const handleScroll = () => {
+    let scrollFrame = 0;
+    const pathLength = pathRef.current?.getTotalLength() ?? 0;
+
+    const updateScrollAnimation = () => {
+      scrollFrame = 0;
       const container = containerRef.current;
       const path = pathRef.current;
       const fillPath = fillPathRef.current;
@@ -2618,6 +2404,7 @@ function OurProcessSection() {
 
       const containerRect = container.getBoundingClientRect();
       const windowHeight = window.innerHeight;
+      if (containerRect.bottom < -120 || containerRect.top > windowHeight + 120) return;
 
       // Animation triggers when top of timeline crosses center of the screen
       const threshold = windowHeight / 2;
@@ -2626,7 +2413,6 @@ function OurProcessSection() {
       let progress = progressStart / totalHeight;
       progress = Math.max(0, Math.min(1, progress));
 
-      const pathLength = path.getTotalLength();
       if (pathLength === 0) return;
 
       // Update active stroke glow progression
@@ -2666,22 +2452,29 @@ function OurProcessSection() {
         }
       });
 
-      setActiveStep(newActiveStep);
+      if (newActiveStep !== activeStepRef.current) {
+        activeStepRef.current = newActiveStep;
+        setActiveStep(newActiveStep);
+      }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    handleScroll();
+    const handleScroll = () => {
+      if (!scrollFrame) scrollFrame = requestAnimationFrame(updateScrollAnimation);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    updateScrollAnimation();
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(scrollFrame);
     };
   }, [yPositions, pathD]);
 
-  const handleMouseMove = (idx: number, e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = `${e.clientX - rect.left}px`;
-    const y = `${e.clientY - rect.top}px`;
-    setGlows((prev) => ({ ...prev, [idx]: { x, y } }));
+    e.currentTarget.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
+    e.currentTarget.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
   };
 
   return (
@@ -2943,7 +2736,6 @@ function OurProcessSection() {
           const isLeft = idx % 2 === 0;
           const isActivated = activeStep >= idx;
           const isCurrent = activeStep === idx;
-          const glow = glows[idx] || { x: "50%", y: "50%" };
 
           return (
             <div
@@ -2969,7 +2761,7 @@ function OurProcessSection() {
                   speed={0.3}
                   chaos={0.08}
                   borderRadius={28}
-                  onMouseMove={(e) => handleMouseMove(idx, e)}
+                  onMouseMove={handleMouseMove}
                   className={`bento-card group p-6 sm:p-8 flex flex-col gap-5 relative transition-all duration-[500ms] cursor-default ${
                     isCurrent 
                       ? "border-accent/40 shadow-[0_0_24px_rgba(243, 33, 0,0.08)] bg-[#111111]/90" 
@@ -2977,11 +2769,6 @@ function OurProcessSection() {
                       ? "border-white/10 bg-[#111111]/80"
                       : "border-white/5 bg-[#111111]/30"
                   }`}
-                  style={{
-                    // @ts-expect-error Custom CSS variables
-                    "--mouse-x": glow.x,
-                    "--mouse-y": glow.y,
-                  }}
                 >
                   {/* Card Header (Icon & Step title) */}
                   <div className="flex items-center gap-3.5">
@@ -3052,7 +2839,7 @@ function AnimatedCounter({ value, formatter }: { value: number; formatter: (val:
   const [displayValue, setDisplayValue] = useState(value);
   
   useEffect(() => {
-    let start = displayValue;
+    const start = displayValue;
     const end = value;
     if (start === end) return;
     
@@ -3116,7 +2903,6 @@ function ProjectEstimatorSection() {
   const getEstimation = () => {
     let basePrice = 35000;
     let baseWeeks = 2.5;
-    let baseComplexity = "Medium";
     let pageCost = 3500;
     let basePagesIncluded = 5;
 
@@ -3124,28 +2910,24 @@ function ProjectEstimatorSection() {
       case "landing":
         basePrice = 15000;
         baseWeeks = 1.5;
-        baseComplexity = "Low";
         pageCost = 2000;
         basePagesIncluded = 1;
         break;
       case "website":
         basePrice = 35000;
         baseWeeks = 2.5;
-        baseComplexity = "Medium";
         pageCost = 3500;
         basePagesIncluded = 5;
         break;
       case "app":
         basePrice = 75000;
         baseWeeks = 5;
-        baseComplexity = "High";
         pageCost = 5000;
         basePagesIncluded = 5;
         break;
       case "saas":
         basePrice = 120000;
         baseWeeks = 8;
-        baseComplexity = "Premium";
         pageCost = 8000;
         basePagesIncluded = 5;
         break;
@@ -3196,7 +2978,7 @@ function ProjectEstimatorSection() {
     const totalPrice = (basePrice + pagesCostTotal + featuresCostTotal) * priceMultiplier;
     const totalWeeks = (baseWeeks + featuresWeeksTotal) * weeksMultiplier;
 
-    let complexity = baseComplexity;
+    let complexity: "Low" | "Medium" | "High" | "Premium";
     if (totalPrice >= 180000) {
       complexity = "Premium";
     } else if (totalPrice >= 95000) {
@@ -3387,7 +3169,7 @@ function ProjectEstimatorSection() {
                 return (
                   <button
                     key={t.id}
-                    onClick={() => setTimeline(t.id as any)}
+                    onClick={() => setTimeline(t.id as "flexible" | "standard" | "priority")}
                     className={`py-3.5 px-3 rounded-lg flex flex-col items-center justify-center gap-1 transition-all duration-[350ms] border outline-none ${
                       isActive
                         ? "bg-accent border-accent text-white shadow-[0_4px_16px_rgba(243, 33, 0,0.15)] scale-[1.01]"

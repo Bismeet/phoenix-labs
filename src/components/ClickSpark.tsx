@@ -33,23 +33,18 @@ const ClickSpark = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sparksRef = useRef<Spark[]>([]);
   const animationIdRef = useRef<number | null>(null);
-  const isVisibleRef = useRef(true);
   const reducedMotionRef = useRef(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const parent = canvas.parentElement;
-    if (!parent) return;
-
     let resizeTimeout: number | undefined;
 
     const resizeCanvas = () => {
-      const { width, height } = parent.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      const nextWidth = Math.max(1, Math.round(width * dpr));
-      const nextHeight = Math.max(1, Math.round(height * dpr));
+      const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 820 ? 1 : 1.25);
+      const nextWidth = Math.max(1, Math.round(window.innerWidth * dpr));
+      const nextHeight = Math.max(1, Math.round(window.innerHeight * dpr));
 
       if (canvas.width !== nextWidth || canvas.height !== nextHeight) {
         canvas.width = nextWidth;
@@ -62,13 +57,11 @@ const ClickSpark = ({
       resizeTimeout = window.setTimeout(resizeCanvas, 100);
     };
 
-    const resizeObserver = new ResizeObserver(handleResize);
-    resizeObserver.observe(parent);
-
     resizeCanvas();
+    window.addEventListener("resize", handleResize, { passive: true });
 
     return () => {
-      resizeObserver.disconnect();
+      window.removeEventListener("resize", handleResize);
       window.clearTimeout(resizeTimeout);
     };
   }, []);
@@ -107,14 +100,14 @@ const ClickSpark = ({
     };
 
     const draw = (timestamp: number) => {
-      if (reducedMotionRef.current || !isVisibleRef.current || sparksRef.current.length === 0) {
+      if (reducedMotionRef.current || document.hidden || sparksRef.current.length === 0) {
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         animationIdRef.current = null;
         return;
       }
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 820 ? 1 : 1.25);
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.scale(dpr, dpr);
@@ -149,22 +142,15 @@ const ClickSpark = ({
     };
 
     const startAnimation = () => {
-      if (animationIdRef.current || reducedMotionRef.current || !isVisibleRef.current) return;
+      if (animationIdRef.current || reducedMotionRef.current || document.hidden) return;
       animationIdRef.current = requestAnimationFrame(draw);
     };
 
-    const visibilityObserver = new IntersectionObserver(
-      ([entry]) => {
-        isVisibleRef.current = entry.isIntersecting;
-        if (!isVisibleRef.current) {
-          stopAnimation();
-        } else if (sparksRef.current.length > 0) {
-          startAnimation();
-        }
-      },
-      { threshold: 0.01 }
-    );
-    visibilityObserver.observe(canvas);
+    const handleVisibility = () => {
+      if (document.hidden) stopAnimation();
+      else if (sparksRef.current.length > 0) startAnimation();
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
 
     const handleMotionChange = (event: MediaQueryListEvent) => {
       reducedMotionRef.current = event.matches;
@@ -181,7 +167,7 @@ const ClickSpark = ({
 
     return () => {
       stopAnimation();
-      visibilityObserver.disconnect();
+      document.removeEventListener("visibilitychange", handleVisibility);
       motionQuery.removeEventListener("change", handleMotionChange);
       delete (canvas as HTMLCanvasElement & { startClickSparkAnimation?: () => void }).startClickSparkAnimation;
     };
@@ -192,9 +178,8 @@ const ClickSpark = ({
     if (!canvas) return;
     if (reducedMotionRef.current) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+    const x = event.clientX;
+    const y = event.clientY;
     const now = performance.now();
 
     const newSparks = Array.from({ length: sparkCount }, (_, i) => ({

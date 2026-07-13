@@ -286,12 +286,11 @@ html {
     );
 }
 
-@media (min-width: 1024px) {
-  .phoenix-site-gradient,
-  .brand-gradient-bg,
-  .phoenix-dark-gradient {
-    background-attachment: fixed;
-  }
+/* Fixed background attachments trigger full-page repaints during smooth scroll. */
+.phoenix-site-gradient,
+.brand-gradient-bg,
+.phoenix-dark-gradient {
+  background-attachment: scroll;
 }
 
 .social-tray {
@@ -995,7 +994,7 @@ html {
   border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 32px;
   background: linear-gradient(135deg, rgba(16, 16, 16, 0.82), rgba(6, 6, 6, 0.62));
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(12px);
   box-shadow: 0 28px 90px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 

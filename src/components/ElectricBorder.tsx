@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
+import { getPerformanceTier } from '../utils/performanceProfile';
 import './ElectricBorder.css';
 
 function hexToRgba(hex: string, alpha: number = 1): string {
@@ -179,14 +180,14 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const desktopOctaves = 6;
-    const mobileOctaves = 4;
+    const desktopOctaves = 4;
     const lacunarity = 1.6;
     const gain = 0.7;
     const baseFlatness = 0;
 
     let isVisible = false;
     let isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const lowPowerDevice = getPerformanceTier() === 'low';
     let borderOffset = window.innerWidth < 768 ? 32 : 52;
 
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -208,6 +209,12 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
       const width = w + borderOffset * 2;
       const height = h + borderOffset * 2;
 
+      if (!isVisible || lowPowerDevice || window.innerWidth < 768) {
+        canvas.width = 1;
+        canvas.height = 1;
+        return { width, height };
+      }
+
       const dpr = getDpr();
       canvas.width = Math.max(1, Math.round(width * dpr));
       canvas.height = Math.max(1, Math.round(height * dpr));
@@ -220,13 +227,13 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
 
     const drawElectricBorder = (currentTime: number) => {
       if (!canvas || !ctx) return;
-      if (!isVisible || isReducedMotion) {
+      if (!isVisible || isReducedMotion || lowPowerDevice || window.innerWidth < 768) {
         animationRef.current = null;
         return;
       }
 
       const isMobileView = window.innerWidth < 768;
-      const frameInterval = isMobileView ? 50 : 33;
+      const frameInterval = 42;
       if (currentTime - lastPaintTimeRef.current < frameInterval) {
         animationRef.current = requestAnimationFrame(drawElectricBorder);
         return;
@@ -254,7 +261,7 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
       ctx.lineJoin = 'round';
 
       const scale = isMobileView ? 30 : 42;
-      const octaves = isMobileView ? mobileOctaves : desktopOctaves;
+      const octaves = desktopOctaves;
       const left = borderOffset;
       const top = borderOffset;
       const borderWidth = width - 2 * borderOffset;
@@ -263,7 +270,7 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
       const radius = Math.min(borderRadius, maxRadius);
 
       const approximatePerimeter = 2 * (borderWidth + borderHeight) + 2 * Math.PI * radius;
-      const sampleCount = Math.max(32, Math.min(isMobileView ? 140 : 240, Math.floor(approximatePerimeter / 4)));
+      const sampleCount = Math.max(32, Math.min(150, Math.floor(approximatePerimeter / 6)));
 
       ctx.beginPath();
 
@@ -304,7 +311,7 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
     };
 
     const startAnimation = () => {
-      if (animationRef.current || isReducedMotion || !isVisible) return;
+      if (animationRef.current || isReducedMotion || lowPowerDevice || window.innerWidth < 768 || !isVisible) return;
       lastFrameTimeRef.current = performance.now();
       lastPaintTimeRef.current = 0;
       animationRef.current = requestAnimationFrame(drawElectricBorder);
@@ -315,9 +322,14 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
         const wasVisible = isVisible;
         isVisible = entry.isIntersecting;
         if (isVisible && !wasVisible) {
+          const newSize = updateSize();
+          width = newSize.width;
+          height = newSize.height;
           startAnimation();
         } else if (!isVisible) {
           stopAnimation();
+          canvas.width = 1;
+          canvas.height = 1;
         }
       },
       { rootMargin: '120px 0px', threshold: 0.01 }

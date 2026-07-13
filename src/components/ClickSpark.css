@@ -5,11 +5,11 @@
 }
 
 .click-spark__canvas {
-  position: absolute;
+  position: fixed;
   inset: 0;
   display: block;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   pointer-events: none;
   user-select: none;
   z-index: 9999;
