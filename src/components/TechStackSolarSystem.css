@@ -677,7 +677,14 @@
 }
 
 @media (max-width: 640px) {
-  .tech-solar-section { min-height: 790px; padding: 88px 16px 72px; }
+  .tech-solar-section {
+    --orbit-inner-width: min(68vw, 250px);
+    --orbit-inner-height: min(50vw, 175px);
+    --orbit-middle-width: min(90vw, 340px);
+    --orbit-middle-height: min(62vw, 228px);
+    min-height: 790px;
+    padding: 88px 16px 72px;
+  }
   .tech-solar-section::before { opacity: .22; background-size: 173px 197px, 257px 233px, 319px 287px; }
   .tech-solar-header h2 { margin-top: 18px; font-size: clamp(44px, 14vw, 60px); }
   .tech-solar-copy { margin-top: 18px; font-size: 12px; line-height: 1.55; }
@@ -708,8 +715,8 @@
     background: transparent;
     box-shadow: none;
     color: rgba(255, 242, 231, .68);
-    font-size: 5.8px;
-    letter-spacing: .075em;
+    font-size: 7.5px;
+    letter-spacing: .045em;
     opacity: .74;
     transform: translate(-50%, 0);
   }

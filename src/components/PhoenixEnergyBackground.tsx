@@ -113,96 +113,6 @@ const ATMOSPHERE_FRAGMENT_SHADER = `
   }
 `;
 
-const VORTEX_FRAGMENT_SHADER = `
-  precision highp float;
-
-  uniform float uTime;
-  uniform float uProgress;
-  uniform vec2 uPointer;
-  uniform vec2 uCenter;
-  varying vec2 vUv;
-
-  float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
-  }
-
-  float noise(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-    vec2 u = f * f * (3.0 - 2.0 * f);
-    return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
-      mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
-  }
-
-  float fbm(vec2 p) {
-    float value = 0.0;
-    float amplitude = 0.53;
-    mat2 rotation = mat2(0.79, -0.61, 0.61, 0.79);
-    for (int i = 0; i < 4; i++) {
-      value += amplitude * noise(p);
-      p = rotation * p * 2.02 + 8.13;
-      amplitude *= 0.47;
-    }
-    return value;
-  }
-
-  float ridge(float value) {
-    return 1.0 - abs(value * 2.0 - 1.0);
-  }
-
-  void main() {
-    vec2 p = vUv - uCenter;
-    p.x *= 1.32;
-    p += uPointer * vec2(0.018, 0.012);
-
-    float formed = smoothstep(0.18, 0.58, uProgress);
-    float resolved = smoothstep(0.66, 0.98, uProgress);
-    p *= mix(1.28, 0.91, formed);
-    float time = uTime * 0.055;
-
-    vec2 firstWarp = vec2(
-      fbm(p * 3.15 + vec2(time * 0.75, -time * 0.36)),
-      fbm(p * 3.15 + vec2(7.6 - time * 0.42, 2.8 + time * 0.61))
-    ) - 0.5;
-    vec2 warpedP = p + firstWarp * mix(0.23, 0.14, formed);
-    float radius = length(warpedP);
-    float angle = atan(warpedP.y, warpedP.x);
-    float granular = fbm(warpedP * 10.4 + firstWarp * 3.0 - vec2(time * 0.62, time * 0.28));
-    float turbulent = fbm(vec2(angle * 1.4, radius * 8.6) + firstWarp * 2.6 - vec2(time * 2.4, time * 0.5));
-    float spiral = angle * mix(2.35, 3.15, formed) + radius * mix(15.0, 20.0, formed) - time * 6.2 + (turbulent - 0.5) * 4.1;
-
-    float broadRibbon = pow(max(0.0, 0.5 + 0.5 * sin(spiral)), mix(3.2, 5.8, resolved));
-    float splitRibbon = pow(max(0.0, 0.5 + 0.5 * sin(spiral * 1.63 + granular * 4.2 + 1.2)), 10.0);
-    float hairline = pow(max(0.0, 0.5 + 0.5 * sin(spiral * 2.7 - radius * 21.0)), 23.0);
-    float radialEnvelope = (1.0 - smoothstep(0.09, 0.78, radius)) * smoothstep(0.025, 0.105, radius);
-    float brokenEdge = smoothstep(0.25, 0.82, ridge(granular)) * (0.52 + turbulent * 0.48);
-    float plasma = (broadRibbon * 0.72 + splitRibbon * 0.54 + hairline * 0.32) * radialEnvelope * brokenEdge;
-
-    float ringOne = exp(-abs(radius - mix(0.22, 0.28, formed)) * mix(16.0, 24.0, resolved));
-    float ringTwo = exp(-abs(radius - mix(0.39, 0.44, formed)) * 17.0) * 0.48;
-    plasma *= 0.42 + ringOne + ringTwo;
-
-    float coreBreath = 0.94 + sin(uTime * 0.38) * 0.06;
-    float coreShape = radius + (granular - 0.5) * 0.072;
-    float hotCore = exp(-coreShape * mix(9.8, 13.6, resolved)) * coreBreath;
-    float whiteCenter = exp(-coreShape * 29.0) * (0.78 + granular * 0.52);
-    float corona = exp(-abs(coreShape - 0.115) * 23.0) * (0.36 + turbulent * 0.64);
-    float energy = hotCore * 1.14 + whiteCenter * 2.15 + corona * 0.72 + plasma * mix(0.72, 1.28, formed);
-    vec3 deepEmber = vec3(0.18, 0.006, 0.001);
-    vec3 bloodOrange = vec3(0.71, 0.038, 0.002);
-    vec3 moltenOrange = vec3(1.0, 0.235, 0.012);
-    vec3 whiteHeat = vec3(1.0, 0.79, 0.40);
-    vec3 color = mix(deepEmber, bloodOrange, smoothstep(0.025, 0.34, energy));
-    color = mix(color, moltenOrange, smoothstep(0.28, 0.94, energy));
-    color = mix(color, whiteHeat, smoothstep(1.0, 2.1, energy));
-    color *= 0.86 + granular * 0.56;
-
-    float alpha = clamp(energy * mix(0.82, 1.14, formed), 0.0, 0.985);
-    alpha *= 1.0 - smoothstep(0.48, 0.86, radius);
-    gl_FragColor = vec4(color, alpha);
-  }
-`;
-
 const PARTICLE_VERTEX_SHADER = `
   uniform float uTime;
   uniform float uProgress;
@@ -322,43 +232,11 @@ function AtmospherePlane({ pointerRef, reducedMotion }: SceneLayerProps) {
   );
 }
 
-function VortexPlane({ reducedMotion }: SceneLayerProps) {
-  const materialRef = useRef<THREE.ShaderMaterial>(null);
-  const viewport = useThree((state) => state.viewport);
-  const size = useThree((state) => state.size);
-  const mobile = size.width < 700;
-
-  const uniforms = useMemo(() => ({
-    uTime: { value: 7.2 },
-    uProgress: { value: reducedMotion ? 1 : 0.44 },
-    uPointer: { value: new THREE.Vector2() },
-    uCenter: { value: new THREE.Vector2(mobile ? 0.5 : 0.285, mobile ? 0.76 : 0.72) },
-  }), [mobile, reducedMotion]);
-
-  return (
-    <group position={[0, 0, -1.72]}>
-      <mesh scale={[viewport.width * (mobile ? 1.15 : 1.24), viewport.height * (mobile ? 1.15 : 1.24), 1]} renderOrder={1}>
-        <planeGeometry args={[1, 1, 1, 1]} />
-        <shaderMaterial
-          ref={materialRef}
-          transparent
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-          vertexShader={VORTEX_VERTEX_SHADER}
-          fragmentShader={VORTEX_FRAGMENT_SHADER}
-          uniforms={uniforms}
-          toneMapped={false}
-        />
-      </mesh>
-    </group>
-  );
-}
-
 function ParticleField({ progressRef, pointerRef, reducedMotion }: SceneLayerProps) {
   const materialRef = useRef<THREE.ShaderMaterial>(null);
   const pointsRef = useRef<THREE.Points>(null);
   const size = useThree((state) => state.size);
-  const count = size.width < 600 ? 160 : size.width < 1000 ? 360 : 820;
+  const count = size.width < 600 ? 96 : size.width < 1000 ? 220 : 440;
   const smoothedProgress = useRef(reducedMotion ? 1 : 0);
 
   const { positions, seeds } = useMemo(() => {
@@ -472,13 +350,6 @@ function EnergyTrails({ progressRef, pointerRef, reducedMotion }: SceneLayerProp
     new THREE.Vector3(1.2, 0.3, -0.9),
     new THREE.Vector3(4.4, -0.45, -1.0),
   ], []);
-  const trailThree = useMemo(() => [
-    new THREE.Vector3(-2.45, 1.8, -1.4),
-    new THREE.Vector3(-0.7, 1.1, -1.25),
-    new THREE.Vector3(1.5, 1.55, -1.25),
-    new THREE.Vector3(4.6, 0.85, -1.4),
-  ], []);
-
   useFrame((_, delta) => {
     if (!groupRef.current) return;
     groupRef.current.position.x = THREE.MathUtils.damp(groupRef.current.position.x, pointerRef.current.x * 0.025, 2.2, delta);
@@ -489,17 +360,28 @@ function EnergyTrails({ progressRef, pointerRef, reducedMotion }: SceneLayerProp
     <group ref={groupRef}>
       <EnergyTrail points={trailOne} strength={1.18} progressRef={progressRef} pointerRef={pointerRef} reducedMotion={reducedMotion} />
       {!isMobile && <EnergyTrail points={trailTwo} strength={0.82} progressRef={progressRef} pointerRef={pointerRef} reducedMotion={reducedMotion} />}
-      {!isMobile && size.width >= 1100 && <EnergyTrail points={trailThree} strength={0.56} progressRef={progressRef} pointerRef={pointerRef} reducedMotion={reducedMotion} />}
     </group>
   );
+}
+
+function SceneFrameLimiter() {
+  const invalidate = useThree((state) => state.invalidate);
+
+  useEffect(() => {
+    invalidate();
+    const interval = window.setInterval(invalidate, 1000 / 28);
+    return () => window.clearInterval(interval);
+  }, [invalidate]);
+
+  return null;
 }
 
 function EnergyScene(props: SceneLayerProps) {
   return (
     <>
+      <SceneFrameLimiter />
       <AtmospherePlane {...props} />
       <ParticleField {...props} />
-      <VortexPlane {...props} />
       <EnergyTrails {...props} />
     </>
   );
@@ -521,9 +403,10 @@ function useReducedMotion() {
 
 function useCanvasDprCap() {
   const getCap = () => {
+    if (window.innerWidth < 700) return 1;
     const tier = getPerformanceTier();
     if (tier === "low") return 1;
-    return tier === "balanced" ? 1.1 : 1.2;
+    return tier === "balanced" ? 1.05 : 1.1;
   };
   const [dprCap, setDprCap] = useState(getCap);
 
@@ -553,7 +436,7 @@ export default function PhoenixEnergyBackground({ progressRef, sectionRef }: Pho
   useEffect(() => {
     const section = sectionRef.current;
     const precisePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    if (!section || !precisePointer || reducedMotion) return;
+    if (!section || window.innerWidth < 700 || !precisePointer || reducedMotion) return;
 
     const handlePointerMove = (event: PointerEvent) => {
       const rect = section.getBoundingClientRect();
@@ -581,7 +464,7 @@ export default function PhoenixEnergyBackground({ progressRef, sectionRef }: Pho
       {isVisible && !reducedMotion && (
         <Canvas
           className="phoenix-energy-canvas"
-          frameloop="always"
+          frameloop="demand"
           dpr={[1, dprCap]}
           camera={{ position: [0, 0, 8], fov: 42, near: 0.1, far: 30 }}
           gl={{ alpha: true, antialias: false, powerPreference: dprCap === 1 ? "low-power" : "high-performance" }}

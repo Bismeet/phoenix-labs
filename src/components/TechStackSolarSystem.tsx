@@ -293,24 +293,43 @@ function TechStarfield() {
       if (visible && !reducedMotion && !staticQuality) frame = requestAnimationFrame(tick);
     };
 
+    const releaseBackingStore = () => {
+      cancelAnimationFrame(frame);
+      frame = 0;
+      previousDraw = 0;
+      canvas.width = 1;
+      canvas.height = 1;
+      context.setTransform(1, 0, 0, 1, 0, 0);
+    };
+
     const resizeObserver = new ResizeObserver(() => {
+      if (!visible) {
+        releaseBackingStore();
+        return;
+      }
       resize();
       start();
     });
     const visibilityObserver = new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
-      start();
+      const nextVisible = entry.isIntersecting;
+      if (nextVisible === visible) return;
+      visible = nextVisible;
+      if (visible) {
+        resize();
+        start();
+      } else {
+        releaseBackingStore();
+      }
     }, { rootMargin: "12% 0px" });
     const handleMotionPreference = () => {
       reducedMotion = reducedMotionMedia.matches;
-      start();
+      if (visible) start();
     };
 
     resizeObserver.observe(host);
     visibilityObserver.observe(host);
     reducedMotionMedia.addEventListener("change", handleMotionPreference);
-    resize();
-    draw(performance.now());
+    releaseBackingStore();
 
     return () => {
       cancelAnimationFrame(frame);

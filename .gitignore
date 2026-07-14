@@ -13,6 +13,9 @@ dist-ssr
 *.local
 .env
 
+# Local visual-audit output
+artifacts/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
